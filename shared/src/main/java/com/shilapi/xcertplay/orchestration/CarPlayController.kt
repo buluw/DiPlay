@@ -435,6 +435,9 @@ class CarPlayController(
 
     fun isClosed(): Boolean = closed
 
+    /** Media controls use the active AirPlay session even when its primary screen stream is absent. */
+    fun hasActiveMediaSession(): Boolean = !closed && activeSession != null
+
     /** Nonblocking identity for wheel controls: only an unclosed phone with an accepted primary stream. */
     fun activeAirPlaySessionToken(): Any? {
         if (closed) return null

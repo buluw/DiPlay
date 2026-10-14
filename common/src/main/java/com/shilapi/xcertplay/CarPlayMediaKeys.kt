@@ -85,6 +85,7 @@ internal object CarPlayMediaKeys {
         }
         next.nowPlayingListener = { _ -> onNowPlayingChanged(next) }
         next.artworkListener = { id, bytes -> onArtworkChanged(next, id, bytes) }
+        LeapmotorWheelKeys.attach(context, next)
         val retained = next.nowPlayingSnapshot()
         onNowPlayingChanged(next)
         next.matchingArtworkSnapshot(retained.artworkTransferId)?.let { onArtworkChanged(next, it.id, it.bytes) }
@@ -95,6 +96,7 @@ internal object CarPlayMediaKeys {
     fun detach(expected: CarPlayController?) {
         if (expected == null || controller !== expected) return
         com.shilapi.xcertplay.media.AmbientMusicController.releasePlaybackOwner(expected)
+        LeapmotorWheelKeys.detach(expected)
         expected.playbackListener = null
         expected.nowPlayingListener = null
         expected.artworkListener = null
@@ -105,7 +107,8 @@ internal object CarPlayMediaKeys {
 
     /** Called when CarPlay music starts or stops; may run on any thread. */
     fun onMediaAudioChanged(active: Boolean) {
-        mainHandler.post { synchronized(this) { updateLocked(active) } }
+        val expected = synchronized(this) { controller } ?: return
+        mainHandler.post { synchronized(this) { if (controller === expected) updateLocked(active) } }
     }
 
     /** The iPhone started or stopped playing; may run on any thread. */
@@ -327,8 +330,10 @@ internal object CarPlayMediaKeys {
             else {
                 focusEventRevision += 1
                 // Only permanent loss moves media keys elsewhere; transient losses come back.
-                if (change == AudioManager.AUDIOFOCUS_LOSS) focusHeld = false
-                else if (change == AudioManager.AUDIOFOCUS_GAIN) focusHeld = true
+                if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_GAIN) {
+                    focusHeld = change == AudioManager.AUDIOFOCUS_GAIN
+                    LeapmotorWheelKeys.setMediaSourceReleased(expectedController, released = !focusHeld)
+                }
                 true
             }
         }
@@ -383,6 +388,7 @@ internal object CarPlayMediaKeys {
                 )
                 .build(),
         )
+        controller?.let { LeapmotorWheelKeys.updateMedia(it, nowPlaying, playing) }
     }
 
     private fun send(index: Int, source: String) {

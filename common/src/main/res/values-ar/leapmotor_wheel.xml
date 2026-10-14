@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">أزرار مقود Leapmotor</string>
+    <string name="settings_leapmotor_diagnostics_title">تشخيص أزرار مقود Leapmotor</string>
+    <string name="settings_leapmotor_enabled">استقبال أزرار مقود ليب موتور</string>
+    <string name="settings_leapmotor_enabled_hint">مشاركة الأغنية وحالة تشغيل CarPlay مع السيارة وتمرير أزرار السابق والتالي والتشغيل والإيقاف المؤقت. مفعّل افتراضيًا وتُطبّق التغييرات فورًا.</string>
+    <string name="settings_leapmotor_diagnostics_hint">لتشخيص مشكلة، فعّل التسجيل وافصل موسيقى بلوتوث السيارة وشغّل موسيقى CarPlay. اضغط أزرار المقود ثم احفظ تقرير التشخيص. تم الإرسال يعني الإضافة إلى قائمة الانتظار وليس تأكيد iPhone.</string>
+    <string name="settings_leapmotor_open_controls">فتح إعدادات أزرار المقود</string>
+    <string name="settings_leapmotor_clear">مسح السجلات</string>
+    <string name="settings_leapmotor_status">%1$s\nمستقبل البث: %2$s\nرسائل البث المستلمة: %3$d\nطلبات CarPlay المرسلة: %4$d\n\nالأحداث الأخيرة:\n%5$s</string>
+    <string name="settings_leapmotor_waiting">بانتظار اتصال CarPlay</string>
+    <string name="settings_leapmotor_registered">مسجل</string>
+    <string name="settings_leapmotor_registration_failed">فشل التسجيل</string>
+    <string name="settings_leapmotor_no_events">لا توجد أحداث بعد</string>
+    <string name="settings_leapmotor_previous">المقطع السابق</string>
+    <string name="settings_leapmotor_next">المقطع التالي</string>
+    <string name="settings_leapmotor_toggle">تشغيل أو إيقاف مؤقت</string>
+    <string name="settings_leapmotor_submitted">تم الإرسال</string>
+    <string name="settings_leapmotor_not_connected">CarPlay غير متصل</string>
+    <string name="settings_leapmotor_ignored">تم التجاهل</string>
+    <string name="settings_leapmotor_not_submitted">لم يتم الإرسال</string>
+    <string name="settings_leapmotor_video_player">تم التعامل معه عبر مشغل فيديو السيارة</string>
+    <string name="settings_leapmotor_media_status">إبلاغ حالة الوسائط (المصدر 14): %1$s\nرسائل البث المرسلة: %2$d</string>
+    <string name="settings_leapmotor_media_sent">تم الإرسال؛ لم يتم تأكيد استلام السيارة</string>
+    <string name="settings_leapmotor_media_failed">فشل الإرسال</string>
+    <string name="settings_leapmotor_media_waiting">بانتظار حالة الموسيقى</string>
+    <string name="settings_leapmotor_recording">تسجيل تشخيص المقود</string>
+    <string name="settings_leapmotor_recording_hint">معطّل افتراضيًا. يبدأ التفعيل تسجيلًا جديدًا للأزرار وحالة الوسائط. يوقف التعطيل التسجيل ويحتفظ بالسجلات السابقة للتصدير. تستمر أزرار المقود في العمل.</string>
+    <string name="settings_leapmotor_recording_off">التسجيل متوقف. تظهر السجلات السابقة فقط.</string>
+</resources>

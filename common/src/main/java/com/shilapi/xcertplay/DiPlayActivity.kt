@@ -106,6 +106,8 @@ internal enum class SettingsSection {
     WHEEL_KEYS,
     CONNECTION_SETUP,
     DIAGNOSTICS,
+    LEAPMOTOR_WHEEL_DIAGNOSTICS,
+    LEAPMOTOR_WHEEL_KEYS,
     AUTOMATIC_CONNECTION,
     USB_CONNECTION,
     BYD_ADB,
@@ -142,8 +144,9 @@ internal object SettingsInformationArchitecture {
             SettingsSection.CARPLAY_CONTROLS,
             SettingsSection.WHEEL_KEYS,
             SettingsSection.CAR_BUTTON,
+            SettingsSection.LEAPMOTOR_WHEEL_KEYS,
         ),
-        SettingsCategory.DIAGNOSTICS to setOf(SettingsSection.DIAGNOSTICS),
+        SettingsCategory.DIAGNOSTICS to setOf(SettingsSection.DIAGNOSTICS, SettingsSection.LEAPMOTOR_WHEEL_DIAGNOSTICS),
         SettingsCategory.ADVANCED to setOf(
             SettingsSection.CLUSTER_MAP,
             SettingsSection.EXPERIMENTAL_DISPLAY,
@@ -197,6 +200,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     private var testToneTrack: AudioTrack? = null
     private var toneStop: Runnable? = null
     private var exportButton: Button? = null
+    private var leapmotorWheelStatus: TextView? = null
     private var rootScroll: ScrollView? = null
     private var settingsRailScroll: ScrollView? = null
     private var reconnectBar: View? = null
@@ -368,6 +372,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         rememberLaunchAppearance()
         languagePreferenceAtCreate = AppLocale.preference(this)
         com.shilapi.xcertplay.hud.BydNavigationOutputs.onAppOpened(applicationContext)
+        LeapmotorWheelKeys.initialize(this)
         PhoneAudioRoute.attach(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         if (Build.VERSION.SDK_INT >= 28) {
@@ -654,6 +659,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         reconnectBar = null
         readinessCard = null
         exportButton = null
+        leapmotorWheelStatus = null
         bydAdbControls = null
         adbSwitches.clear()
         adbStatus = null
@@ -1700,6 +1706,34 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             card.addView(label(destination + getString(R.string.nothing_is_sent_automatically_protocol_payloads_and_creden), 14, MUTED).apply { setPadding(0, dp(12), 0, 0) })
             toggle(card, getString(R.string.settings_fps_counter), getString(R.string.settings_fps_counter_description),
                 AirPlayPersistence.loadFpsCounter(this)) { AirPlayPersistence.saveFpsCounter(this, it) }
+        }
+        filteredSection(content, SettingsSection.LEAPMOTOR_WHEEL_DIAGNOSTICS,
+            getString(R.string.settings_leapmotor_diagnostics_title), R.drawable.ic_dp_diagnostics) { card ->
+            toggle(card, getString(R.string.settings_leapmotor_recording),
+                getString(R.string.settings_leapmotor_recording_hint), LeapmotorWheelKeys.diagnosticsEnabled(this)) {
+                LeapmotorWheelKeys.setDiagnosticsEnabled(this, it)
+                refreshLeapmotorWheelStatus()
+            }
+            card.addView(label(getString(R.string.settings_leapmotor_diagnostics_hint), 14, MUTED))
+            val readout = label(leapmotorWheelDiagnosticText(), 14, TEXT)
+                .apply { setPadding(0, dp(SETTINGS_BLOCK_GAP_DP), 0, dp(SETTINGS_BLOCK_GAP_DP)) }
+            if (searchIndexSink == null) leapmotorWheelStatus = readout
+            card.addView(readout)
+            card.addView(button(getString(R.string.settings_leapmotor_clear), false) {
+                LeapmotorWheelKeys.clearHistory()
+                refreshLeapmotorWheelStatus()
+            }, matchButton(0, 60))
+            card.addView(button(getString(R.string.settings_leapmotor_open_controls), false) {
+                settingsCategory = SettingsCategory.VEHICLE
+                render()
+            }, matchButton(SETTINGS_BLOCK_GAP_DP, 60))
+        }
+        filteredSection(content, SettingsSection.LEAPMOTOR_WHEEL_KEYS,
+            getString(R.string.settings_leapmotor_controls_title), R.drawable.ic_dp_controls) { card ->
+            toggle(card, getString(R.string.settings_leapmotor_enabled),
+                getString(R.string.settings_leapmotor_enabled_hint), LeapmotorWheelKeys.enabled(this)) {
+                LeapmotorWheelKeys.setEnabled(this, it)
+            }
         }
         filteredSection(content, SettingsSection.AUTOMATIC_CONNECTION,
             getString(R.string.automatic_connection), R.drawable.ic_dp_automation) { card ->
@@ -5240,6 +5274,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     }
 
     private fun refreshStatus() {
+        refreshLeapmotorWheelStatus()
         val running = CarPlayBackgroundSession.hasSession()
         status?.text = when {
             setupError != null -> getString(R.string.setup_needs_attention)
@@ -5257,6 +5292,50 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         connectButton?.isEnabled = setupError == null
         refreshReconnectBar()
         refreshReadiness()
+    }
+
+    private fun refreshLeapmotorWheelStatus() {
+        leapmotorWheelStatus?.text = leapmotorWheelDiagnosticText()
+    }
+
+    private fun leapmotorWheelDiagnosticText(): String {
+        val snapshot = LeapmotorWheelKeys.snapshot()
+        val listener = getString(when (snapshot.listener) {
+            LeapmotorWheelKeys.ListenerState.DISABLED -> R.string.disabled_value
+            LeapmotorWheelKeys.ListenerState.WAITING -> R.string.settings_leapmotor_waiting
+            LeapmotorWheelKeys.ListenerState.REGISTERED -> R.string.settings_leapmotor_registered
+            LeapmotorWheelKeys.ListenerState.ERROR -> R.string.settings_leapmotor_registration_failed
+        })
+        val clock = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val events = snapshot.events.takeLast(6).joinToString("\n") { event ->
+            val operation = getString(when (event.button) {
+                com.shilapi.xcertplay.airplay.CarPlayMediaButton.PREVIOUS -> R.string.settings_leapmotor_previous
+                com.shilapi.xcertplay.airplay.CarPlayMediaButton.NEXT -> R.string.settings_leapmotor_next
+                com.shilapi.xcertplay.airplay.CarPlayMediaButton.PLAY_PAUSE -> R.string.settings_leapmotor_toggle
+                else -> R.string.settings_leapmotor_ignored
+            })
+            val result = getString(when (event.result) {
+                LeapmotorWheelKeys.Result.SUBMITTED -> R.string.settings_leapmotor_submitted
+                LeapmotorWheelKeys.Result.NOT_CONNECTED -> R.string.settings_leapmotor_not_connected
+                LeapmotorWheelKeys.Result.IGNORED -> R.string.settings_leapmotor_ignored
+                LeapmotorWheelKeys.Result.VIDEO_PLAYER -> R.string.settings_leapmotor_video_player
+                LeapmotorWheelKeys.Result.FAILED -> R.string.settings_leapmotor_not_submitted
+            })
+            val value = event.value?.replace(Regex("[\\r\\n\\t]"), " ") ?: "?"
+            "${clock.format(Date(event.timeMillis))} value=$value playMediaType=${event.playMediaType ?: "?"}\n$operation · $result"
+        }.ifEmpty { getString(R.string.settings_leapmotor_no_events) }
+        val reportState = getString(when {
+            !snapshot.enabled -> R.string.disabled_value
+            snapshot.mediaReport == LeapmotorWheelKeys.MediaReportState.SENT -> R.string.settings_leapmotor_media_sent
+            snapshot.mediaReport == LeapmotorWheelKeys.MediaReportState.FAILED -> R.string.settings_leapmotor_media_failed
+            else -> R.string.settings_leapmotor_media_waiting
+        })
+        val recordingNotice = if (snapshot.diagnosticsEnabled) ""
+            else getString(R.string.settings_leapmotor_recording_off) + "\n\n"
+        return recordingNotice + getString(R.string.settings_leapmotor_media_status, reportState, snapshot.mediaReports) + "\n\n" +
+            getString(R.string.settings_leapmotor_status,
+            getString(if (snapshot.connected) R.string.carplay_connected else R.string.settings_leapmotor_not_connected),
+            listener, snapshot.received, snapshot.submitted, events)
     }
     private fun authorizeClusterRouting() {
         val app = applicationContext
@@ -5361,6 +5440,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         appendLine("Session: ${if (CarPlayBackgroundSession.active) "active" else if (CarPlayBackgroundSession.hasSession()) "connecting" else "stopped"}")
         appendLine(PhoneWakeDiagnostics.report(appContext))
         appendLine("Head-unit board: ${Build.BOARD}; hardware: ${Build.HARDWARE}; build: ${Build.DISPLAY}")
+        appendLine(LeapmotorWheelKeys.diagnosticReport())
         appendLine()
         appendLine("--- Current cluster display diagnostics (even when disabled) ---")
         appendLine(ClusterMapPresentation.diagnosticReport(appContext))

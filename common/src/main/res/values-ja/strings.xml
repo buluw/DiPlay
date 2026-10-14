@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DiPlay</string>
+    <string name="app_name">DiPlay 零跑</string>
     <string name="language_section_title">言語</string>
     <string name="language_app_language">アプリの言語</string>
     <string name="language_system_default">システムの設定に従う</string>

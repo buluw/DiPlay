@@ -692,6 +692,11 @@ class AdaptiveSettingsUiTest {
         assertTrue(text(R.string.car_button_in_carplay) in vehicle)
         assertTrue(text(R.string.wheel_siri_key) in vehicle)
         assertTrue(text(R.string.settings_wheel_keys) in vehicle)
+        assertTrue(text(R.string.settings_leapmotor_controls_title) in vehicle)
+        assertFalse(text(R.string.settings_leapmotor_controls_title) in advanced)
+        val diagnostics = visibleIn(R.string.diagnostics)
+        assertTrue(text(R.string.settings_leapmotor_recording) in diagnostics)
+        assertFalse(text(R.string.settings_leapmotor_recording) in vehicle)
         assertTrue(text(R.string.settings_navigation_wheel_volume) in advanced)
         assertFalse(text(R.string.settings_navigation_wheel_volume) in audio)
         assertFalse(text(R.string.settings_navigation_wheel_volume) in vehicle)
@@ -708,6 +713,32 @@ class AdaptiveSettingsUiTest {
             R.string.side_panel, R.string.split_screen_areas, R.string.carplay_rotation).forEach {
             assertFalse(text(it), text(it) in display)
         }
+    }
+
+    @Test fun leapmotorControlsDefaultOnAndDiagnosticRecordingHasItsOwnPersistentSwitch() {
+        val screen = openSettings()
+        fun open(category: SettingsCategory) {
+            ReflectionHelpers.setField(screen, "settingsCategory", category)
+            ReflectionHelpers.callInstanceMethod<Unit>(screen, "render")
+        }
+        fun setting(label: Int) = descendants(screen.window.decorView).filterIsInstance<Switch>()
+            .single { it.contentDescription == screen.getString(label) }
+        open(SettingsCategory.VEHICLE)
+        assertTrue(setting(R.string.settings_leapmotor_enabled).isChecked)
+        open(SettingsCategory.DIAGNOSTICS)
+        assertFalse(setting(R.string.settings_leapmotor_recording).isChecked)
+        setting(R.string.settings_leapmotor_recording).performClick()
+        assertTrue(LeapmotorWheelKeys.diagnosticsEnabled(context))
+        assertTrue(LeapmotorWheelKeys.enabled(context))
+        open(SettingsCategory.VEHICLE)
+        setting(R.string.settings_leapmotor_enabled).performClick()
+        open(SettingsCategory.DIAGNOSTICS)
+        assertTrue(setting(R.string.settings_leapmotor_recording).isChecked)
+        setting(R.string.settings_leapmotor_recording).performClick()
+        assertFalse(LeapmotorWheelKeys.diagnosticsEnabled(context))
+        assertFalse(LeapmotorWheelKeys.enabled(context))
+        open(SettingsCategory.DIAGNOSTICS)
+        assertFalse(setting(R.string.settings_leapmotor_recording).isChecked)
     }
 
     @Test fun usbChargingIsSavedForTheNextWiredConnectionWithoutDroppingTheSession() {

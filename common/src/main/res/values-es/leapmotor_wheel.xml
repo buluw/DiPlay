@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">Controles del volante Leapmotor</string>
+    <string name="settings_leapmotor_diagnostics_title">Diagnóstico del volante Leapmotor</string>
+    <string name="settings_leapmotor_enabled">Recibir botones del volante Leapmotor</string>
+    <string name="settings_leapmotor_enabled_hint">Comparte la canción y el estado de CarPlay con el coche y transmite los botones anterior, siguiente y reproducción/pausa. Activado por defecto; los cambios se aplican de inmediato.</string>
+    <string name="settings_leapmotor_diagnostics_hint">Para investigar un problema, activa el registro, desconecta la música Bluetooth del coche y reproduce música en CarPlay. Pulsa los botones y guarda un informe. Enviado significa en cola, sin confirmación del iPhone.</string>
+    <string name="settings_leapmotor_open_controls">Abrir controles del volante</string>
+    <string name="settings_leapmotor_clear">Borrar registros</string>
+    <string name="settings_leapmotor_status">%1$s\nReceptor de emisiones: %2$s\nEmisiones recibidas: %3$d\nSolicitudes CarPlay enviadas: %4$d\n\nEventos recientes:\n%5$s</string>
+    <string name="settings_leapmotor_waiting">Esperando conexión CarPlay</string>
+    <string name="settings_leapmotor_registered">Registrado</string>
+    <string name="settings_leapmotor_registration_failed">Error de registro</string>
+    <string name="settings_leapmotor_no_events">Todavía no hay eventos</string>
+    <string name="settings_leapmotor_previous">Pista anterior</string>
+    <string name="settings_leapmotor_next">Pista siguiente</string>
+    <string name="settings_leapmotor_toggle">Reproducir/pausar</string>
+    <string name="settings_leapmotor_submitted">Enviado</string>
+    <string name="settings_leapmotor_not_connected">CarPlay desconectado</string>
+    <string name="settings_leapmotor_ignored">Ignorado</string>
+    <string name="settings_leapmotor_not_submitted">No enviado</string>
+    <string name="settings_leapmotor_video_player">Gestionado por el reproductor del coche</string>
+    <string name="settings_leapmotor_media_status">Informe multimedia (fuente 14): %1$s\nEmisiones enviadas: %2$d</string>
+    <string name="settings_leapmotor_media_sent">Enviado; recepción del coche sin confirmar</string>
+    <string name="settings_leapmotor_media_failed">Error al enviar</string>
+    <string name="settings_leapmotor_media_waiting">Esperando el estado de música</string>
+    <string name="settings_leapmotor_recording">Registrar diagnóstico del volante</string>
+    <string name="settings_leapmotor_recording_hint">Desactivado por defecto. Al activar se inicia una captura nueva de botones y avisos multimedia. Al desactivar se detiene el registro y se conserva lo capturado para exportarlo. Los controles siguen funcionando.</string>
+    <string name="settings_leapmotor_recording_off">El registro está desactivado. Solo se muestran registros anteriores.</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">Leapmotor ステアリング操作</string>
+    <string name="settings_leapmotor_diagnostics_title">Leapmotor ステアリング診断</string>
+    <string name="settings_leapmotor_enabled">Leapmotor のステアリングボタンを受信</string>
+    <string name="settings_leapmotor_enabled_hint">CarPlay の曲名と再生状態を車両に通知し、前の曲、次の曲、再生／一時停止を転送します。初期設定はオンです。変更はすぐに反映されます。</string>
+    <string name="settings_leapmotor_diagnostics_hint">問題を調べるには記録をオンにし、車両の Bluetooth 音楽接続を切断して CarPlay で音楽を再生します。ステアリングボタンを押してから診断レポートを保存してください。「送信要求済み」はキューへの登録を示し、iPhone の受信確認ではありません。</string>
+    <string name="settings_leapmotor_open_controls">ステアリング操作の設定を開く</string>
+    <string name="settings_leapmotor_clear">記録を消去</string>
+    <string name="settings_leapmotor_status">%1$s\nブロードキャスト受信：%2$s\n受信数：%3$d\nCarPlay への送信要求数：%4$d\n\n最近のイベント：\n%5$s</string>
+    <string name="settings_leapmotor_waiting">CarPlay の接続待ち</string>
+    <string name="settings_leapmotor_registered">登録済み</string>
+    <string name="settings_leapmotor_registration_failed">登録失敗</string>
+    <string name="settings_leapmotor_no_events">イベントはまだありません</string>
+    <string name="settings_leapmotor_previous">前の曲</string>
+    <string name="settings_leapmotor_next">次の曲</string>
+    <string name="settings_leapmotor_toggle">再生／一時停止</string>
+    <string name="settings_leapmotor_submitted">送信要求済み</string>
+    <string name="settings_leapmotor_not_connected">CarPlay 未接続</string>
+    <string name="settings_leapmotor_ignored">無視</string>
+    <string name="settings_leapmotor_not_submitted">送信要求なし</string>
+    <string name="settings_leapmotor_video_player">車両の動画プレーヤーで処理</string>
+    <string name="settings_leapmotor_media_status">メディア状態の通知（ソース 14）：%1$s\n送信数：%2$d</string>
+    <string name="settings_leapmotor_media_sent">送信済み。車両の受信は未確認です</string>
+    <string name="settings_leapmotor_media_failed">送信失敗</string>
+    <string name="settings_leapmotor_media_waiting">音楽の状態待ち</string>
+    <string name="settings_leapmotor_recording">ステアリング診断を記録</string>
+    <string name="settings_leapmotor_recording_hint">初期設定はオフです。オンにするとボタンとメディア通知の新しい記録を開始します。オフにすると記録を停止し、収集済みの記録はエクスポート用に保持します。操作機能には影響しません。</string>
+    <string name="settings_leapmotor_recording_off">記録はオフです。以前に収集した記録のみ表示します。</string>
+</resources>

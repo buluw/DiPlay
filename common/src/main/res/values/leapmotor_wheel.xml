@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">Leapmotor wheel controls</string>
+    <string name="settings_leapmotor_diagnostics_title">Leapmotor wheel diagnostics</string>
+    <string name="settings_leapmotor_enabled">Receive Leapmotor wheel buttons</string>
+    <string name="settings_leapmotor_enabled_hint">Share CarPlay track and playback state with the car and forward previous, next and play/pause buttons. On by default; changes take effect immediately.</string>
+    <string name="settings_leapmotor_diagnostics_hint">To investigate a problem, turn on recording here, disconnect car Bluetooth music and play CarPlay music. Press the wheel buttons, then save a diagnostic report. Submitted means queued, not confirmed by the iPhone.</string>
+    <string name="settings_leapmotor_open_controls">Open wheel control settings</string>
+    <string name="settings_leapmotor_clear">Clear records</string>
+    <string name="settings_leapmotor_status">%1$s\nBroadcast listener: %2$s\nBroadcasts received: %3$d\nCarPlay requests submitted: %4$d\n\nRecent events:\n%5$s</string>
+    <string name="settings_leapmotor_waiting">Waiting for a CarPlay connection</string>
+    <string name="settings_leapmotor_registered">Registered</string>
+    <string name="settings_leapmotor_registration_failed">Registration failed</string>
+    <string name="settings_leapmotor_no_events">No events yet</string>
+    <string name="settings_leapmotor_previous">Previous track</string>
+    <string name="settings_leapmotor_next">Next track</string>
+    <string name="settings_leapmotor_toggle">Play/pause</string>
+    <string name="settings_leapmotor_submitted">Submitted</string>
+    <string name="settings_leapmotor_not_connected">CarPlay not connected</string>
+    <string name="settings_leapmotor_ignored">Ignored</string>
+    <string name="settings_leapmotor_not_submitted">Not submitted</string>
+    <string name="settings_leapmotor_video_player">Handled by car video player</string>
+    <string name="settings_leapmotor_media_status">Media state reporting (source 14): %1$s\nBroadcasts sent: %2$d</string>
+    <string name="settings_leapmotor_media_sent">Sent; car receipt is not confirmed</string>
+    <string name="settings_leapmotor_media_failed">Send failed</string>
+    <string name="settings_leapmotor_media_waiting">Waiting for music state</string>
+    <string name="settings_leapmotor_recording">Record wheel diagnostics</string>
+    <string name="settings_leapmotor_recording_hint">Off by default. Turning on starts a new capture of wheel buttons and media reports. Turning off stops recording and keeps the captured records for export. Wheel controls continue to work.</string>
+    <string name="settings_leapmotor_recording_off">Recording is off. Only previously captured records are shown.</string>
+</resources>

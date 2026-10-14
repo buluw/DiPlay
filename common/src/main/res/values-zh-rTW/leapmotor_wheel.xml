@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">零跑方向盤控制</string>
+    <string name="settings_leapmotor_diagnostics_title">零跑方向盤診斷</string>
+    <string name="settings_leapmotor_enabled">接收零跑方向盤按鍵</string>
+    <string name="settings_leapmotor_enabled_hint">向車機同步 CarPlay 歌曲和播放狀態，並轉送上一首、下一首和播放／暫停按鍵。預設開啟，變更立即生效。</string>
+    <string name="settings_leapmotor_diagnostics_hint">排查問題時，先開啟記錄開關，中斷原車藍牙音樂連線並播放 CarPlay 音樂。按方向盤按鍵後儲存診斷報告。「已提交」表示進入傳送佇列，不代表 iPhone 已執行。</string>
+    <string name="settings_leapmotor_open_controls">開啟方向盤控制設定</string>
+    <string name="settings_leapmotor_clear">清除記錄</string>
+    <string name="settings_leapmotor_status">%1$s\n廣播監聽：%2$s\n收到廣播：%3$d 次\nCarPlay 指令已提交：%4$d 次\n\n最近紀錄：\n%5$s</string>
+    <string name="settings_leapmotor_waiting">等待 CarPlay 連線</string>
+    <string name="settings_leapmotor_registered">已註冊</string>
+    <string name="settings_leapmotor_registration_failed">註冊失敗</string>
+    <string name="settings_leapmotor_no_events">尚未收到按鍵</string>
+    <string name="settings_leapmotor_previous">上一首</string>
+    <string name="settings_leapmotor_next">下一首</string>
+    <string name="settings_leapmotor_toggle">播放／暫停</string>
+    <string name="settings_leapmotor_submitted">已提交</string>
+    <string name="settings_leapmotor_not_connected">CarPlay 未連線</string>
+    <string name="settings_leapmotor_ignored">已忽略</string>
+    <string name="settings_leapmotor_not_submitted">未提交</string>
+    <string name="settings_leapmotor_video_player">已交給車機影片播放器</string>
+    <string name="settings_leapmotor_media_status">媒體狀態回報（來源 14）：%1$s\n回報傳送：%2$d 次</string>
+    <string name="settings_leapmotor_media_sent">已傳送，未確認車機接收</string>
+    <string name="settings_leapmotor_media_failed">傳送失敗</string>
+    <string name="settings_leapmotor_media_waiting">等待音樂狀態</string>
+    <string name="settings_leapmotor_recording">記錄方向盤診斷</string>
+    <string name="settings_leapmotor_recording_hint">預設關閉。開啟時開始新一輪按鍵和媒體回報記錄；關閉後停止記錄，保留本輪記錄供匯出。關閉記錄不影響方向盤控制。</string>
+    <string name="settings_leapmotor_recording_off">記錄已關閉，僅顯示之前已擷取的記錄。</string>
+</resources>

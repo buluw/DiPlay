@@ -40,6 +40,17 @@ import org.robolectric.util.ReflectionHelpers
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [28, 33], qualifiers = "en", manifest = Config.NONE)
 class CarButtonImagePickerTest {
+    @Test fun carButtonUsesLeapmotorForFreshAndLegacyDefaultLabelsButKeepsCustomNames() {
+        val app = RuntimeEnvironment.getApplication()
+        assertEquals("Leapmotor", AirPlayPersistence.loadOemLabel(app))
+        for (previousDefault in listOf("BYD", "", "   ")) {
+            AirPlayPersistence.saveOemLabel(app, previousDefault)
+            assertEquals("Leapmotor", AirPlayPersistence.loadOemLabel(app))
+        }
+        AirPlayPersistence.saveOemLabel(app, "My T03")
+        assertEquals("My T03", AirPlayPersistence.loadOemLabel(app))
+    }
+
     @Test fun carButtonHasOneImageChoiceThatOpensDocumentLocations() = withHome { activity ->
         val buttons = homeButtons(activity)
         val choose = buttons.single { it.text == activity.getString(R.string.choose_image) }

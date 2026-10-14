@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_controls_title">Кнопки керма Leapmotor</string>
+    <string name="settings_leapmotor_diagnostics_title">Діагностика кнопок керма Leapmotor</string>
+    <string name="settings_leapmotor_enabled">Приймати кнопки керма Leapmotor</string>
+    <string name="settings_leapmotor_enabled_hint">Передає автомобілю трек і стан CarPlay, а в CarPlay — кнопки попереднього й наступного треку та відтворення/паузи. Типово ввімкнено; зміни діють одразу.</string>
+    <string name="settings_leapmotor_diagnostics_hint">Для пошуку проблеми ввімкніть запис, відключіть музику Bluetooth автомобіля та запустіть CarPlay. Натисніть кнопки керма й збережіть звіт. Надіслано означає додавання до черги без підтвердження iPhone.</string>
+    <string name="settings_leapmotor_open_controls">Відкрити налаштування кнопок керма</string>
+    <string name="settings_leapmotor_clear">Очистити записи</string>
+    <string name="settings_leapmotor_status">%1$s\nПриймач повідомлень: %2$s\nОтримано повідомлень: %3$d\nЗапитів CarPlay надіслано: %4$d\n\nОстанні події:\n%5$s</string>
+    <string name="settings_leapmotor_waiting">Очікування підключення CarPlay</string>
+    <string name="settings_leapmotor_registered">Зареєстровано</string>
+    <string name="settings_leapmotor_registration_failed">Помилка реєстрації</string>
+    <string name="settings_leapmotor_no_events">Подій ще немає</string>
+    <string name="settings_leapmotor_previous">Попередній трек</string>
+    <string name="settings_leapmotor_next">Наступний трек</string>
+    <string name="settings_leapmotor_toggle">Відтворення/пауза</string>
+    <string name="settings_leapmotor_submitted">Надіслано</string>
+    <string name="settings_leapmotor_not_connected">CarPlay не підключено</string>
+    <string name="settings_leapmotor_ignored">Пропущено</string>
+    <string name="settings_leapmotor_not_submitted">Не надіслано</string>
+    <string name="settings_leapmotor_video_player">Оброблено відеопрогравачем автомобіля</string>
+    <string name="settings_leapmotor_media_status">Стан медіа (джерело 14): %1$s\nПовідомлень надіслано: %2$d</string>
+    <string name="settings_leapmotor_media_sent">Надіслано; отримання автомобілем не підтверджено</string>
+    <string name="settings_leapmotor_media_failed">Помилка надсилання</string>
+    <string name="settings_leapmotor_media_waiting">Очікування стану музики</string>
+    <string name="settings_leapmotor_recording">Записувати діагностику керма</string>
+    <string name="settings_leapmotor_recording_hint">Типово вимкнено. Увімкнення починає новий запис кнопок і повідомлень про стан медіа. Вимкнення зупиняє запис і зберігає зібрані дані для експорту. Кнопки продовжують працювати.</string>
+    <string name="settings_leapmotor_recording_off">Запис вимкнено. Показано лише раніше зібрані дані.</string>
+</resources>

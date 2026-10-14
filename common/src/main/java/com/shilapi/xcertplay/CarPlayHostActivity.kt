@@ -286,6 +286,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     // The full-window viewport stays independent of the letterboxed SurfaceView dimensions.
     private var videoView: View? = null
+    private var contentRoot: FrameLayout? = null
     private var fallbackVideoView: SurfaceView? = null
     private var fallbackVideoBounds: CarPlaySurfaceBounds? = null
     // The last picture of a SurfaceView video output, kept when its surface goes (DiPlay leaves the screen) and
@@ -340,6 +341,7 @@ class CarPlayHostActivity : ComponentActivity() {
     private var picturePanelGeneration = 0
     private var gestureOverlay: View? = null
     private var settingsMenu: View? = null
+    private var overlayImeBottom = 0
     private var mfiTargetGroup: RadioGroup? = null
     private var mfiI2cFields: View? = null
     private var mfiRemoteFields: View? = null
@@ -366,6 +368,7 @@ class CarPlayHostActivity : ComponentActivity() {
     private var iconStatusView: TextView? = null
     private var safeAreaSummaryView: TextView? = null
     private var safeAreaEditor: View? = null
+    private var safeAreaEditorControls: View? = null
     private var safeAreaEditorView: SafeAreaEditorView? = null
     private var safeAreaEditSize: DisplaySize? = null
     private var safeAreaEditorActive = false
@@ -1671,6 +1674,10 @@ class CarPlayHostActivity : ComponentActivity() {
 
     private fun buildContentView(): View {
         val root = FrameLayout(this).apply { setBackgroundColor(Color.BLACK) }
+        contentRoot = root
+        ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
+            applyContentInsets(root, insets)
+        }
         val video = TextureView(this).apply {
             isOpaque = false
             surfaceTextureListener = textureListener
@@ -1857,6 +1864,32 @@ class CarPlayHostActivity : ComponentActivity() {
         connectionPanel = viewport
         updateDebugOverlays()
         return root
+    }
+
+    private fun applyContentInsets(root: FrameLayout, insets: WindowInsetsCompat): WindowInsetsCompat {
+        val multiWindow = isMultiWindowActive()
+        var types = WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.captionBar()
+        if (!harmanFullscreenEnabled) {
+            if (!hideTopBar || multiWindow) types = types or WindowInsetsCompat.Type.statusBars()
+            if (!hideBottomBar || multiWindow) types = types or WindowInsetsCompat.Type.navigationBars()
+        }
+        val safe = insets.getInsets(types)
+        // Video, gestures and overlays share this one viewport. Let the measured video size
+        // drive CarPlay negotiation and touch mapping; never subtract fixed car-specific heights.
+        root.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+        // Read IME before insetting: older Android versions cannot preserve its separate type
+        // when dispatching platform Insets to children. Only overlays reserve the remaining height.
+        overlayImeBottom = (insets.getInsets(WindowInsetsCompat.Type.ime()).bottom - safe.bottom).coerceAtLeast(0)
+        settingsMenu?.setPadding(0, 0, 0, overlayImeBottom)
+        safeAreaEditorControls?.let { controls ->
+            val params = controls.layoutParams as FrameLayout.LayoutParams
+            if (params.bottomMargin != overlayImeBottom) {
+                params.bottomMargin = overlayImeBottom
+                controls.layoutParams = params
+            }
+        }
+        // Children (including the waiting screen) must not reserve the same bars a second time.
+        return insets.inset(safe.left, safe.top, safe.right, safe.bottom)
     }
 
     // DiPlay's side panel: placed over the part of the stream CarPlay leaves black (placeSidePanel), so it
@@ -2184,13 +2217,16 @@ class CarPlayHostActivity : ComponentActivity() {
             return true
         }
         val panel = sidePanel ?: return false
+        val view = videoView ?: return false
         val vertical = sidePanelOpenEdge() == Gravity.BOTTOM
-        val position = if (vertical) tab.y + event.y else tab.x + event.x
-        val across = if (vertical) tab.x + event.x else tab.y + event.y
+        // Tab and video share a parent; remove the video origin (including system-bar padding).
+        val x = tab.x + event.x - view.x
+        val y = tab.y + event.y - view.y
+        val position = if (vertical) y else x
+        val across = if (vertical) x else y
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 val from = sidePanelOpenEdge() ?: return false
-                val view = videoView ?: return false
                 sidePanelScreen = sidePanelScreenRect(view.width, view.height) ?: return false
                 sidePanelEdge = when (from) {
                     Gravity.BOTTOM -> Gravity.TOP
@@ -2542,7 +2578,8 @@ class CarPlayHostActivity : ComponentActivity() {
             override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
                 getChildAt(0)?.let { panel ->
                     panel.layoutParams.width = settingsMenuWidth(MeasureSpec.getSize(widthMeasureSpec))
-                    val availableHeight = MeasureSpec.getSize(heightMeasureSpec)
+                    val availableHeight = (MeasureSpec.getSize(heightMeasureSpec) - paddingTop - paddingBottom)
+                        .coerceAtLeast(1)
                     panel.layoutParams.height = minOf(
                         availableHeight * SWIPE_PANEL_HEIGHT_PERCENT / 100,
                         (availableHeight - dp(SWIPE_PANEL_MARGIN_DP * 2)).coerceAtLeast(1),
@@ -2554,6 +2591,8 @@ class CarPlayHostActivity : ComponentActivity() {
             setBackgroundColor(SWIPE_SCRIM_COLOR)
             isClickable = true
             layoutDirection = resources.configuration.layoutDirection
+            // A menu rebuilt while the keyboard is visible must start above it.
+            setPadding(0, 0, 0, overlayImeBottom)
         }
         val panel = FrameLayout(this).apply {
             background = swipeMenuChrome()
@@ -3876,8 +3915,10 @@ class CarPlayHostActivity : ComponentActivity() {
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM,
-            ),
+            ).apply { bottomMargin = overlayImeBottom },
         )
+        // Keep the editor canvas at the full CarPlay size; only its actions avoid the keyboard.
+        safeAreaEditorControls = controls
         safeAreaEditorView = editor
         return overlay
     }
@@ -4702,7 +4743,10 @@ class CarPlayHostActivity : ComponentActivity() {
         safeAreaEditorActive = true
         // Keep the current activity size; changing system bars here would remap the safe area.
         settingsMenu?.visibility = View.GONE
-        safeAreaEditor?.visibility = View.VISIBLE
+        safeAreaEditor?.apply {
+            visibility = View.VISIBLE
+            ViewCompat.requestApplyInsets(this)
+        }
         editorView.setRect(initial, size.width, size.height)
         appendLog(
             "Safe area editor opened for ${size.width}x${size.height}; " +
@@ -4715,7 +4759,10 @@ class CarPlayHostActivity : ComponentActivity() {
         safeAreaEditorActive = false
         safeAreaEditSize = null
         safeAreaEditor?.visibility = View.GONE
-        settingsMenu?.visibility = View.VISIBLE
+        settingsMenu?.apply {
+            visibility = View.VISIBLE
+            ViewCompat.requestApplyInsets(this)
+        }
         updateSafeAreaSummary()
         updateResolutionMenu()
         appendLog("Safe area editor closed")
@@ -5587,7 +5634,10 @@ class CarPlayHostActivity : ComponentActivity() {
         menuOpen = true
         updateCallPopupGuard()
         gestureOverlay?.visibility = View.GONE
-        settingsMenu?.visibility = View.VISIBLE
+        settingsMenu?.apply {
+            visibility = View.VISIBLE
+            ViewCompat.requestApplyInsets(this)
+        }
         safeAreaEditor?.visibility = View.GONE
         updateSafeAreaSummary()
         updateResolutionMenu()
@@ -6123,7 +6173,9 @@ class CarPlayHostActivity : ComponentActivity() {
         }
         val hideTop = hideTopBar && !multiWindow
         val hideBottom = hideBottomBar && !multiWindow
-        WindowCompat.setDecorFitsSystemWindows(window, !(hideTop && hideBottom))
+        // Own the insets consistently, including on head units whose dock overlays a full-screen
+        // app window and on Android versions which enforce edge-to-edge layout.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         if (hideTop) {
             controller.hide(WindowInsetsCompat.Type.statusBars())
@@ -6135,8 +6187,12 @@ class CarPlayHostActivity : ComponentActivity() {
         } else {
             controller.show(WindowInsetsCompat.Type.navigationBars())
         }
-        controller.systemBarsBehavior =
+        controller.systemBarsBehavior = if (hideTop || hideBottom) {
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        } else {
+            WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+        }
+        contentRoot?.let(ViewCompat::requestApplyInsets)
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).roundToInt()

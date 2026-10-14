@@ -1,6 +1,14 @@
-# DiPlay
+# DiPlay 零跑（Leapmotor）
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+
+`leapmotor` 分支基於上游 DiPlay v0.2.19，加入零跑方向盤上一首、下一首、播放／暫停控制。方向盤控制預設開啟，診斷記錄預設關閉，並包含零跑名稱、車標及原車上下列的版面適配。
+
+[下載零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19-leapmotor) · [發佈說明](docs/RELEASE-NOTES-0.2.19-leapmotor.md) · [設定與驗證](docs/LEAPMOTOR_WHEEL_TEST.md)
+
+APK 保留套件名稱 `com.shihab.diplay.hudtest` 和先前零跑版本的簽章，可直接覆蓋安裝。這是適配預覽版，整合後的新版仍需實車驗證。
+
+## 上游專案說明
 
 為相容的比亞迪 Android 車機提供有線與無線 CarPlay，採用熟悉的 DiAuto 介面。DiPlay 是獨立應用程式，正式版套件名稱為 `com.shihab.diplay`。
 

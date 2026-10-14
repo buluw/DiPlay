@@ -1,6 +1,14 @@
-# DiPlay
+# DiPlay 零跑（Leapmotor）
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+
+This `leapmotor` branch adds Leapmotor steering-wheel media controls to upstream DiPlay v0.2.19. Previous track, next track and play/pause are enabled by default; diagnostic recording is off by default. It also includes Leapmotor branding and head-unit system-bar layout fixes.
+
+[Download the Leapmotor APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19-leapmotor) · [Release notes](docs/RELEASE-NOTES-0.2.19-leapmotor.md) · [Setup and validation](docs/LEAPMOTOR_WHEEL_TEST.md)
+
+The APK retains `com.shihab.diplay.hudtest` and the previous Leapmotor build's signing identity for in-place updates. This is a preview release; the integrated build still needs vehicle validation.
+
+## Upstream project documentation
 
 **CarPlay for compatible BYD Android head units.** Wired and wireless, with the familiar DiAuto interface. Independent app: `com.shihab.diplay`.
 

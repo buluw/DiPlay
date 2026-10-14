@@ -39,8 +39,9 @@ android {
 
     buildTypes {
         debug {
+            // Keep the installed test package identity so existing users can update in place.
             applicationIdSuffix = ".hudtest"
-            versionNameSuffix = "-hud-test"
+            versionNameSuffix = "-leapmotor"
         }
         release {
             optimization {
