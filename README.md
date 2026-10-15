@@ -2,7 +2,7 @@
 
 本仓库在上游 **DiPlay v0.2.20** 基础上，提供零跑车机的 CarPlay 适配，重点包括 **零跑方向盘媒体控制**、**2021–2023 款 C11 Dock / 上下栏布局**和零跑名称、车标。
 
-[下载零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) · [发布说明](docs/RELEASE-NOTES-0.2.19.1.md) · [适配与验证记录](docs/LEAPMOTOR_WHEEL_TEST.md) · [繁體中文](README.zh-TW.md)
+[下载零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.20.1) · [发布说明](docs/RELEASE-NOTES-0.2.20.1.md) · [适配与验证记录](docs/LEAPMOTOR_WHEEL_TEST.md) · [繁體中文](README.zh-TW.md)
 
 ## 分支说明
 
@@ -22,33 +22,34 @@
 - **独立诊断**：记录开关默认关闭；开启才采集，关闭不影响方控。关闭记录后重连仍保留已采集结果，可手动导出。
 - **布局修复**：修复保留系统栏时的侧栏拖动偏移，并处理设置界面与安全区编辑器的键盘避让。
 
-## 当前开发源码
+## 0.2.20.1 更新
 
-源码已合并上游 v0.2.20，内部版本为 0.2.20-leapmotor / versionCode 39；保留零跑适配，新增仪表目标屏选择及本仓库自助更新渠道。该源码尚未发布，现有 Release 仍如下表。详见 [仪表与更新说明](docs/LEAPMOTOR_CLUSTER_AND_UPDATES.md)。
+完整合并上游 v0.2.20，保留零跑适配，新增仪表目标屏选择、5 秒预览确认及本仓库自助更新渠道。仪表投屏为实验性功能，需手动确认目标屏幕后重连 CarPlay，仍待实车验证。详见 [仪表与更新说明](docs/LEAPMOTOR_CLUSTER_AND_UPDATES.md)。
 
 ## 当前发布版本
 
 | 项目 | 值 |
 | --- | --- |
-| GitHub Release / 标签 | **0.2.19.1 / `v0.2.19.1`** |
-| 上游基础版本 | DiPlay v0.2.19 |
-| APK 内部版本 / versionCode | `0.2.19-leapmotor` / `38` |
+| GitHub Release / 标签 | **0.2.20.1 / `v0.2.20.1`** |
+| 上游基础版本 | DiPlay v0.2.20 |
+| APK 内部版本 / versionCode | `0.2.20.1-leapmotor` / `40` |
 | 应用包名 | `com.shihab.diplay.hudtest` |
 | 系统要求 | Android 7.1（API 25）及以上 |
 
-`0.2.19.1` 是本次 GitHub Release 的发布编号，沿用已经验证的 APK；安装后显示的应用版本仍为 `0.2.19-leapmotor`。APK 文件名为 `DiPlay-0.2.19-leapmotor-20261014.apk`，Release 同时提供 SHA-256 校验文件。
+本次重新编译独立安装包，APK 内部版本同步更新为 `0.2.20.1-leapmotor`，versionCode 提高到 `40`。APK 文件名为 `DiPlay-0.2.20.1-leapmotor-20261015.apk`，Release 同时提供严格同名的 `.apk.sha256` 校验文件，沿用原包名和签名。
 
 ## 安装与设置
 
-1. 从本仓库 [Release](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) 下载 APK，并安装到车机。
+1. 从本仓库 [Release](https://github.com/buluw/DiPlay/releases/tag/v0.2.20.1) 下载 APK，并安装到车机。
 2. APK 保留此前零跑版本的包名与签名，可覆盖安装之前同签名的零跑测试版并保留数据，无需先卸载。原版 DiPlay 使用另一个包名。
 3. 在 **设置 → 车辆 → 零跑方向盘控制** 检查方控开关，然后连接 CarPlay。
 4. 需要保留原车上下栏和 Dock 时，关闭 **显示 → 隐藏状态栏 / 隐藏导航栏**，并取消应用管家对 DiPlay 的沉浸规则。
-5. 需要排查时，在 **设置 → 诊断 → 零跑方向盘诊断** 开启记录，复现后手动导出报告。
+5. 需要仪表地图时，停车后在 **设置 → 高级 → CarPlay 仪表地图 → 零跑仪表目标屏幕** 选择可访问的公共副屏，确认 5 秒预览，再通过设置提示重连。列表为空时请保留默认关闭状态。
+6. 需要排查时，在 **设置 → 诊断 → 零跑方向盘诊断** 开启记录，复现后手动导出报告。
 
 ## 验证范围
 
-该 APK 对应构建的 **2,724 项单元测试通过**，三个应用模块 lint 均无错误，签名及 ZIP 对齐检查通过。此前已验证来源 14 的实车协议和实体媒体按键；本版普通应用自动上报、原车媒体切换与新版布局仍需实车复测。不同车型、固件及 iOS 版本的兼容性需分别验证。
+完整 CI、独立安装包及签名验证结果见 [本版发布说明](docs/RELEASE-NOTES-0.2.20.1.md)。此前已验证来源 14 的实车协议和实体媒体按键；本版仪表投屏、覆盖安装、原车媒体切换与新版布局仍需实车复测。不同车型、固件及 iOS 版本的兼容性需分别验证。接听适配、自动泊车键学习及延迟专项调试未包含在本版。
 
 ## 上游与许可
 
