@@ -1,49 +1,55 @@
-# DiPlay 零跑（Leapmotor）
+# DiPlay 零跑专用适配分支（Leapmotor）
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+本仓库在上游 **DiPlay v0.2.19** 基础上，提供零跑车机的 CarPlay 适配，重点包括 **零跑方向盘媒体控制**、**2021–2023 款 C11 Dock / 上下栏布局**和零跑名称、车标。
 
-`leapmotor` 分支基于上游 DiPlay v0.2.19，加入零跑方向盘上一首、下一首、播放／暂停控制。方控默认开启，诊断记录默认关闭，并包含零跑名称、车标及原车上下栏布局适配。
+[下载零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) · [发布说明](docs/RELEASE-NOTES-0.2.19.1.md) · [适配与验证记录](docs/LEAPMOTOR_WHEEL_TEST.md) · [繁體中文](README.zh-TW.md)
 
-[下载零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19-leapmotor) · [发布说明](docs/RELEASE-NOTES-0.2.19-leapmotor.md) · [设置与验证](docs/LEAPMOTOR_WHEEL_TEST.md)
+## 分支说明
 
-APK 保留包名 `com.shihab.diplay.hudtest` 和此前零跑版本的签名，可覆盖安装。这是适配预览版，集成后的新版仍需实车验证。
+| 分支 | 用途 |
+| --- | --- |
+| **`leapmotor`（默认分支）** | 零跑专用适配代码、说明及 Release 的来源，日常使用和开发请选择此分支。 |
+| `main` | 保留 Fork 时的上游代码，不包含本仓库的零跑适配提交。 |
 
-## 上游项目说明
+访问本仓库首页会默认打开 `leapmotor`。本仓库的零跑功能和发布以此分支为准。
 
-为兼容的比亚迪安卓车机提供有线及无线 CarPlay，采用 DiAuto 风格界面。
+## 主要适配
 
-> 这些项目专注于比亚迪汽车。它们可能在其他品牌上运行，但其他品牌不在支持范围内，也没有增加支持或修复其品牌特定兼容性问题的计划。
+- **方向盘控制**：上一首、下一首、播放／暂停，默认开启；升级时保留之前已经保存的开关选择。
+- **原车媒体协同**：自动上报媒体来源 14、歌曲和播放状态，仅转发来源 14 的媒体按键；永久失去音频焦点后释放来源，避免抢占原车媒体。
+- **C11 Dock 与上下栏**：适配重点为 2021–2023 款零跑 C11，可选择全屏或保留原车 Dock；视频、触摸和侧栏按同一可用区域布局。
+- **零跑外观**：应用显示名为“DiPlay 零跑”，CarPlay 返回原车按钮使用零跑图标及“Leapmotor”名称。
+- **独立诊断**：记录开关默认关闭；开启才采集，关闭不影响方控。关闭记录后重连仍保留已采集结果，可手动导出。
+- **布局修复**：修复保留系统栏时的侧栏拖动偏移，并处理设置界面与安全区编辑器的键盘避让。
 
-[下载与中文网站](https://shihabal3amri.github.io/DiPlay/zh-Hans/) · [0.2.19 版本](https://github.com/shihabal3amri/DiPlay/releases/tag/v0.2.19) · [完整说明](README.md) · [报告问题](https://github.com/shihabal3amri/DiPlay/issues/new/choose)
+## 当前发布版本
 
-## 0.2.19 — 公开预览版
+| 项目 | 值 |
+| --- | --- |
+| GitHub Release / 标签 | **0.2.19.1 / `v0.2.19.1`** |
+| 上游基础版本 | DiPlay v0.2.19 |
+| APK 内部版本 / versionCode | `0.2.19-leapmotor` / `38` |
+| 应用包名 | `com.shihab.diplay.hudtest` |
+| 系统要求 | Android 7.1（API 25）及以上 |
 
-请安装在允许 APK 安装的 Android 7.1+（API 25+）车机上；Android 7.1–8.1 尚未经实车验证。无需越狱、转接盒、账户或认证服务器。有线及无线核心连接不要求 ADB；可选车辆数据及车辆控制需要支持的固件和已授权网络 ADB。
+`0.2.19.1` 是本次 GitHub Release 的发布编号，沿用已经验证的 APK；安装后显示的应用版本仍为 `0.2.19-leapmotor`。APK 文件名为 `DiPlay-0.2.19-leapmotor-20261014.apk`，Release 同时提供 SHA-256 校验文件。
 
-Wi-Fi Direct 现支持 Android 7.1–9 的旧版建组路径，使用系统返回的真实凭据。首选信道依赖固件 API；Android 7.1–9 无法读回协商频率，所以请求信道在诊断中标为未经验证，系统默认为信道 0。Android 10+ 保留频率验证。也可使用车机内置热点、USB 或[现有 Wi-Fi／同一局域网](docs/EXISTING_WIFI.md)；同一局域网模式由车机和 iPhone 自行连接外部路由器，DiPlay 不替你修改默认路由。[Android 9 Wi-Fi Direct 限制](docs/ANDROID9_WIFI_DIRECT.md)说明清理及持久配置边界。
+## 安装与设置
 
-### 新增与修正
+1. 从本仓库 [Release](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) 下载 APK，并安装到车机。
+2. APK 保留此前零跑版本的包名与签名，可覆盖安装之前同签名的零跑测试版并保留数据，无需先卸载。原版 DiPlay 使用另一个包名。
+3. 在 **设置 → 车辆 → 零跑方向盘控制** 检查方控开关，然后连接 CarPlay。
+4. 需要保留原车上下栏和 Dock 时，关闭 **显示 → 隐藏状态栏 / 隐藏导航栏**，并取消应用管家对 DiPlay 的沉浸规则。
+5. 需要排查时，在 **设置 → 诊断 → 零跑方向盘诊断** 开启记录，复现后手动导出报告。
 
-- **有线连接**：许多车机上有线 CarPlay 的启动快了几秒；iOS 26 的 iPhone 先提供不含 CarPlay 的 USB 模式时也能启动；固件删除了 USB 授权页面的 Android 7.1–9 车机，在已授权网络 ADB 时也能使用有线连接。
-- **通话、Siri 与音乐**：16 kHz 格式的通话、Siri 和导航语音不再以三倍速度向 iPhone 报告播放位置；麦克风首次读取失败时会自动重启；CarPlay 在后台时音乐不再每隔几秒断音。
-- **仪表地图与倒车影像**：DiLink 4 开启仪表地图时，CarPlay 不再在第一次触摸屏幕时重新连接；保留状态栏时，倒车影像后 CarPlay 画面不再缩小。
-- **语言**：新增日语，繁体中文已完整，并补充了 67 条阿拉伯语。
-- **诊断报告**：“**设置 → 诊断 → 在手机上取得报告**”可通过二维码或输入地址和验证码，在手机上下载诊断报告；连接界面会针对每种失败给出提示。
-- **其他**：重新设计的 CarPlay 内设置菜单，以及可选的仪表地图专辑封面卡片。
+## 验证范围
 
-[0.2.19 完整说明](docs/RELEASE-NOTES-0.2.19.md)包含贡献链接及功能限制；构建和验证信息见[验证记录](docs/VALIDATION.md)。Android 7.1–8.1 尚需实车验证，不宣称所有车型的连接、音频或 Siri 问题均已解决。可选功能请停车后测试。
+该 APK 对应构建的 **2,724 项单元测试通过**，三个应用模块 lint 均无错误，签名及 ZIP 对齐检查通过。此前已验证来源 14 的实车协议和实体媒体按键；本版普通应用自动上报、原车媒体切换与新版布局仍需实车复测。不同车型、固件及 iOS 版本的兼容性需分别验证。
 
-### 请提供 0.2.19 的新诊断报告
+## 上游与许可
 
-1. 更新到 **0.2.19**，复现问题并记录发生时间。开机／自动启动问题发生后，可手动打开 DiPlay 导出。
-2. 打开“**设置 → 诊断 → 保存诊断报告**”。Android 10+ 通常保存到 **Downloads/DiPlay**；Android 7.1–9 会请求存储权限并同样保存到该位置，也可点“选择保存位置”。如选择器或公共存储不可用，应用会使用专用外部或私有目录，并在确认中说明目的地。
-3. 使用确认中的**查看报告／分享**；没有分享应用时，可在报告视图中选择并复制文本。检查 `.txt` 并删除隐私信息，再附到匹配的[现有问题](https://github.com/shihabal3amri/DiPlay/issues)，或[新建问题](https://github.com/shihabal3amri/DiPlay/issues/new/choose)。报告不会自动上传，请勿公开热点密码或私有认证文件。
-4. 注明车型／车机、DiLink/Android/完整固件版本、iPhone/iOS、USB／车机热点／Wi-Fi Direct／同一局域网、相关设置、复现步骤、预期与实际结果及故障时间。
+本项目基于 [shihabal3amri/DiPlay](https://github.com/shihabal3amri/DiPlay)，保留上游 GPL-3.0 许可及相关声明；零跑图标来源和历史验证详见 [适配记录](docs/LEAPMOTOR_WHEEL_TEST.md)。车标归其权利人所有。
 
-[从源码构建](docs/BUILD.md)：主应用请选择 `mobile` 模块。`maphost` 是地图演示应用，构建步骤和 APK 路径见说明。
+本分支的上述说明针对零跑适配。上游的比亚迪 HUD、仪表和车辆专属功能不代表已经适配零跑。通用构建及连接说明见 [构建文档](docs/BUILD.md)、[连接说明](docs/INSTALL.md) 和 [第三方声明](docs/THIRD_PARTY_NOTICES.md)。
 
-历史记录：[0.2.17](docs/RELEASE-NOTES-0.2.17.md)、[0.2.16](docs/RELEASE-NOTES-0.2.16.md)、[0.2.15](docs/RELEASE-NOTES-0.2.15.md)、[0.2.14](docs/RELEASE-NOTES-0.2.14.md)、[0.2.13](docs/RELEASE-NOTES-0.2.13.md)、[0.2.12](docs/RELEASE-NOTES-0.2.12.md)、[0.2.11](docs/RELEASE-NOTES-0.2.11.md)、[安装与连接](docs/INSTALL.md)。
-
-这是公开预览版，**未经 Apple 认证**。APK 使用从公开 Carlinkit 固件中提取的既有实验性配件身份，并非为 DiPlay 新签发的 MFi 身份；其中的私钥可被提取，未来 iOS 是否继续接受及其公开分发适用性尚未确定。Android 签名密钥和配件身份不进入 Git 或源代码压缩包；普通源代码/CI 构建默认不配置身份。部分车机仍可能卡顿或无法应用图标大小设置。
-
-标准导航小组件需要支持 Android 小组件的启动器；比亚迪内置主页不接受任意小组件。悬浮地图和嵌入地图需要启用“CarPlay 仪表地图”。应用及网站源代码包含英语、简体中文、繁体中文（台湾）、阿拉伯语、俄语、乌克兰语、西班牙语和日语。应用的香港／澳门及 Hant 选择使用台湾译文，不宣称提供独立地区翻译。[繁体中文说明](README.zh-TW.md)提供安装、设置、隐私和构建指南。源代码、构建说明及许可证随版本提供。
+此软件不是 Apple 认证产品，沿用上游预览版的运行时认证方式。

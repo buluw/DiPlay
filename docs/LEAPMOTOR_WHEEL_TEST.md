@@ -1,11 +1,11 @@
 # DiPlay 零跑适配源码
 
 基于 DiPlay v0.2.19（`e06a250219b2c2288948d8b4ad7203b417db0de1`）。
-当前源码分支：`leapmotor`，发布仓库：`buluw/DiPlay`。
+当前源码及默认分支：`leapmotor`，发布仓库：`buluw/DiPlay`。`main` 保留上游代码，不包含零跑适配提交。
 
 ## 2026-10-15 GitHub 发布
 
-发布标签为 `v0.2.19-leapmotor`，安装包为 `DiPlay-0.2.19-leapmotor-20261014.apk`，版本 `0.2.19-leapmotor`（versionCode 38）。这是 2026-10-14 构建并交付的同一份 APK，保留原包名和签名，可覆盖安装此前的零跑测试版。下载入口和校验值见 [发布说明](RELEASE-NOTES-0.2.19-leapmotor.md)。
+GitHub Release 编号为 **0.2.19.1**，发布标签为 `v0.2.19.1`，安装包为 `DiPlay-0.2.19-leapmotor-20261014.apk`，版本 `0.2.19-leapmotor`（versionCode 38）。这是 2026-10-14 构建并交付的同一份 APK，保留原包名和签名，可覆盖安装此前的零跑测试版。下载入口和校验值见 [发布说明](RELEASE-NOTES-0.2.19.1.md)。
 
 发布前逐一核对了 1,344 个源码文件，与该 APK 的构建快照一致；之后仅补充 README 与发布文档。已核对原构建的完整 CI、standalone 构建及测试 XML：共 2,724 项测试通过，0 失败、0 错误、0 跳过，三个应用模块 lint 均无错误。APK 的 SHA-256、签名及 ZIP 对齐验证通过。
 

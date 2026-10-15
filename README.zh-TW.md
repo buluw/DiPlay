@@ -1,12 +1,18 @@
-# DiPlay 零跑（Leapmotor）
+# DiPlay 零跑專用適配分支（Leapmotor）
 
-[English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
+[專案首頁](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
 `leapmotor` 分支基於上游 DiPlay v0.2.19，加入零跑方向盤上一首、下一首、播放／暫停控制。方向盤控制預設開啟，診斷記錄預設關閉，並包含零跑名稱、車標及原車上下列的版面適配。
 
-[下載零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19-leapmotor) · [發佈說明](docs/RELEASE-NOTES-0.2.19-leapmotor.md) · [設定與驗證](docs/LEAPMOTOR_WHEEL_TEST.md)
+[下載零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) · [發佈說明](docs/RELEASE-NOTES-0.2.19.1.md) · [設定與驗證](docs/LEAPMOTOR_WHEEL_TEST.md)
 
 APK 保留套件名稱 `com.shihab.diplay.hudtest` 和先前零跑版本的簽章，可直接覆蓋安裝。這是適配預覽版，整合後的新版仍需實車驗證。
+
+## 分支與版本
+
+本倉庫的預設分支是 **`leapmotor`**，包含零跑方向盤控制及 2021–2023 款 C11 Dock / 上下列適配；`main` 保留 Fork 時的上游程式碼，未包含本分支的零跑適配提交。
+
+GitHub Release 編號為 **0.2.19.1**，標籤為 `v0.2.19.1`。本次沿用已驗證的 APK，安裝後的應用程式版本仍是 `0.2.19-leapmotor`（versionCode 38），保留原套件名稱與簽章。
 
 ## 上游專案說明
 
