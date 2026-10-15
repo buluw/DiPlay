@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_cluster_target">Pantalla de destino Leapmotor</string>
+    <string name="settings_leapmotor_cluster_none">Sin seleccionar</string>
+    <string name="settings_leapmotor_cluster_hint">Estacione antes de probar. Seleccione la pantalla, confirme la imagen y vuelva a conectar CarPlay. Usa un flujo de mapa independiente, sin duplicar la pantalla principal ni cambiar el modo original del cuadro.</string>
+    <string name="settings_leapmotor_cluster_missing">La pantalla seleccionada no está disponible o cambió su identidad. Selecciónela de nuevo; no se usará otra pantalla.</string>
+    <string name="settings_leapmotor_cluster_no_displays">No hay pantallas secundarias accesibles. Active la proyección del cuadro original y vuelva a abrir esta página.</string>
+    <string name="settings_leapmotor_cluster_test">Prueba de pantalla DiPlay · 5 segundos</string>
+    <string name="settings_leapmotor_cluster_confirm">¿La imagen apareció en el área de proyección deseada? Confirme para guardar la pantalla y activar el mapa en la próxima conexión.</string>
+    <string name="settings_leapmotor_cluster_unavailable">Esta pantalla no permite Presentation. No se guardó la selección.</string>
+</resources>

@@ -1132,6 +1132,11 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     private fun ensureClusterPresentation() {
+        if (controller != null && (clusterStreamTarget != LeapmotorClusterRoute.selected(this) ||
+                (clusterStreamTarget != null && !clusterStreamOnDisplay))) {
+            dismissClusterPresentation()
+            return // Explicit screen changes take effect at the next user-approved connection.
+        }
         if (!AirPlayPersistence.loadClusterMapEnabled(this)) {
             clusterLaunchGate.reset()
             dismissClusterPresentation()
@@ -1149,7 +1154,7 @@ class CarPlayHostActivity : ComponentActivity() {
         clusterLaunchGate.reset()
         ClusterActivityOutput.stop(this)
         val theme = effectiveClusterTheme()
-        if (DiLink51ClusterLayout.supported()) {
+        if (!LeapmotorClusterRoute.configured(this) && DiLink51ClusterLayout.supported()) {
             ensureDiLink51ClusterPresentation(theme)
             return
         }
@@ -1158,24 +1163,34 @@ class CarPlayHostActivity : ComponentActivity() {
             appendLog("Cluster map: no cluster projection display among ${ClusterMapPresentation.describeDisplays(this)}")
             return
         }
-        val presentation = ClusterMapPresentation(this, display, theme) { surface -> runOnUiThread { onClusterSurface(surface) } }
+        lateinit var presentation: ClusterMapPresentation
+        presentation = ClusterMapPresentation(this, display, theme) { surface ->
+            runOnUiThread { if (clusterPresentation === presentation) onClusterSurface(surface) }
+        }
         // The system dismisses a presentation when its display goes away; allow a new one on resume.
         presentation.setOnDismissListener {
             if (clusterPresentation === presentation) {
+                onClusterSurface(null)
                 clusterPresentation = null
                 com.shilapi.xcertplay.hud.BydNavigationOutputs.setClusterMapShown(false)
                 updateClusterMapShown()
             }
         }
         try {
-            presentation.show()
             clusterPresentation = presentation
+            presentation.show()
             updateClusterMapShown()
             presentation.setStreamActive(SCREEN_TYPE_ALT in activeScreenStreamTypes)
             applyClusterTurnOverlay()
             Log.i(ClusterMapPresentation.TAG, "cluster presentation shown display=${display.displayId} name=${display.name}")
             appendLog("Cluster map: presentation shown display=${display.displayId} name=${display.name}")
         } catch (error: RuntimeException) {
+            if (clusterPresentation === presentation) {
+                onClusterSurface(null)
+                clusterPresentation = null
+            }
+            runCatching { presentation.dismiss() }
+            updateClusterMapShown()
             Log.w(ClusterMapPresentation.TAG, "cluster presentation failed", error)
             appendLog("Cluster map: presentation failed ${error.javaClass.simpleName}: ${error.message}")
         }
@@ -1322,6 +1337,7 @@ class CarPlayHostActivity : ComponentActivity() {
     private var adbClusterConfigured = false
     // Whether the running session's cluster stream was sized for a physical cluster display.
     private var clusterStreamOnDisplay = false
+    private var clusterStreamTarget: LeapmotorClusterRoute.Identity? = null
 
     // DiLink 3 creates its cluster display only after DiPlay first projects to the cluster, which can
     // finish after the session has already asked for the virtual fallback stream.
@@ -1332,19 +1348,27 @@ class CarPlayHostActivity : ComponentActivity() {
             if (display?.displayId != displayId) return
             appendLog("Cluster map: display ${display.name} appeared")
             ensureClusterPresentation()
-            if (controller != null && !clusterStreamOnDisplay) {
+            if (controller != null && !clusterStreamOnDisplay && !LeapmotorClusterRoute.configured(this@CarPlayHostActivity)) {
                 reconnectAfterLoss("Cluster display appeared; requesting its stream")
             }
         }
-        override fun onDisplayRemoved(displayId: Int) = Unit
-        override fun onDisplayChanged(displayId: Int) = Unit
+        override fun onDisplayRemoved(displayId: Int) {
+            if (clusterStreamTarget?.id == displayId) dismissClusterPresentation()
+        }
+        override fun onDisplayChanged(displayId: Int) {
+            if (clusterStreamTarget?.id != displayId) return
+            if (LeapmotorClusterRoute.findDisplay(this@CarPlayHostActivity) == null) dismissClusterPresentation()
+            else ensureClusterPresentation()
+        }
     }
 
     private fun clusterDisplayConfig(): AirPlayDisplayConfig? {
         adbClusterConfigured = false
         clusterStreamOnDisplay = false
         requestedSmallWindowForStream = null
+        clusterStreamTarget = LeapmotorClusterRoute.selected(this)
         if (!AirPlayPersistence.loadClusterMapEnabled(this)) return null
+        if (clusterStreamTarget != null && LeapmotorClusterRoute.findDisplay(this) == null) return null
         if (AdbClusterRouter.enabled(this) && ClusterActivityOutput.hasConfirmedRoute()) {
             adbClusterConfigured = true
             clusterStreamOnDisplay = true
@@ -1362,14 +1386,14 @@ class CarPlayHostActivity : ComponentActivity() {
             val size = ClusterMapPresentation.sizeOf(display)
             if (size.x > 0 && size.y > 0) {
                 clusterStreamOnDisplay = true
-                if (DiLink51ClusterLayout.supported()) {
+                if (clusterStreamTarget == null && DiLink51ClusterLayout.supported()) {
                     val plan = DiLink51ClusterLayout.plan(size.x, size.y, theme) ?: return null
                     return DiLink51ClusterLayout.streamConfig().also {
                         MapMirrors.streamAspect = it.widthPixels.toDouble() / it.heightPixels
                         appendLog("Cluster map: fixed 1920x720 stream; layout=$theme viewport=$plan")
                     }
                 }
-                if (DiLink4ClusterDisplay.matches(display.name, size.x, size.y)) {
+                if (clusterStreamTarget == null && DiLink4ClusterDisplay.matches(display.name, size.x, size.y)) {
                     return DiLink4ClusterDisplay.streamConfig(
                         AirPlayPersistence.loadClusterContent(this),
                         safeAreaRect = AirPlayPersistence.loadClusterSafeAreaRect(this),
@@ -1387,6 +1411,8 @@ class CarPlayHostActivity : ComponentActivity() {
                     0,
                     0,
                     AirPlayPersistence.loadClusterContent(this),
+                    baseSafeArea = if (clusterStreamTarget != null) CarPlayClusterDisplay.VIRTUAL_SAFE_AREA_PERCENT
+                        else CarPlayClusterDisplay.SAFE_AREA_PERCENT,
                     markerXPercent = if (smallWindow) AirPlayPersistence.loadClusterSmallWindowMarkerXPercent(this)
                     else AirPlayPersistence.loadClusterMarkerXPercent(this),
                     markerYPercent = if (smallWindow) AirPlayPersistence.loadClusterSmallWindowMarkerYPercent(this)
@@ -5022,6 +5048,8 @@ class CarPlayHostActivity : ComponentActivity() {
         adbClusterConfigured = AdbClusterRouter.enabled(this) && snapshot.controller.configuredClusterSize() ==
             (DiLink4ClusterDisplay.STREAM_WIDTH to DiLink4ClusterDisplay.STREAM_HEIGHT)
         controller = snapshot.controller
+        clusterStreamTarget = snapshot.display.leapmotorClusterTarget
+        clusterStreamOnDisplay = clusterStreamTarget != null && snapshot.controller.configuredClusterSize() != null
         updateClusterMapShown()
         sink = snapshot.sink
         sessionDisplay = snapshot.display
@@ -5173,6 +5201,7 @@ class CarPlayHostActivity : ComponentActivity() {
             displayRotation(), hideTopBar, hideBottomBar, effectiveSize.width, effectiveSize.height,
             viewAreas = pendingViewAreas,
             statusBarShown = statusBarShown(),
+            leapmotorClusterTarget = clusterStreamTarget,
         )
         sessionDisplay = display
         videoView?.let { updateVideoLayout(it.width, it.height) }
@@ -6299,6 +6328,8 @@ internal data class CarPlaySessionDisplay(
     val viewAreas: CarPlayViewAreas? = null,
     /** Whether the status bar was on screen when the session started, or null when unknown. */
     val statusBarShown: Boolean? = null,
+    /** The confirmed external panel negotiated by this session, retained across Activity recreation. */
+    val leapmotorClusterTarget: LeapmotorClusterRoute.Identity? = null,
 )
 
 /**

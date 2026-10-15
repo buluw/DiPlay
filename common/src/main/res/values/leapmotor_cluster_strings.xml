@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_cluster_target">Leapmotor target screen</string>
+    <string name="settings_leapmotor_cluster_none">Not selected</string>
+    <string name="settings_leapmotor_cluster_hint">Park before testing. Choose the screen, confirm the test image, then reconnect CarPlay. Uses the separate map stream; it does not mirror the main screen or switch the OEM instrument mode.</string>
+    <string name="settings_leapmotor_cluster_missing">Selected screen is unavailable or its identity changed. Select it again; no other screen will be used.</string>
+    <string name="settings_leapmotor_cluster_no_displays">No accessible secondary screen. Enable the original instrument projection mode, then reopen this page.</string>
+    <string name="settings_leapmotor_cluster_test">DiPlay screen test · 5 seconds</string>
+    <string name="settings_leapmotor_cluster_confirm">Did the test image appear on the intended instrument projection area? Confirm to save this screen and enable the map at the next connection.</string>
+    <string name="settings_leapmotor_cluster_unavailable">This screen cannot show a Presentation. The selection was not saved.</string>
+</resources>

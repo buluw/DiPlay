@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_cluster_target">Экран приборов Leapmotor</string>
+    <string name="settings_leapmotor_cluster_none">Не выбран</string>
+    <string name="settings_leapmotor_cluster_hint">Проводите проверку на стоянке. Выберите экран, подтвердите изображение и подключите CarPlay заново. Используется отдельный поток карты без зеркалирования главного экрана и смены штатного режима приборов.</string>
+    <string name="settings_leapmotor_cluster_missing">Выбранный экран недоступен или изменились его параметры. Выберите его заново; другой экран автоматически не используется.</string>
+    <string name="settings_leapmotor_cluster_no_displays">Доступных дополнительных экранов нет. Включите штатный режим проекции приборов и откройте эту страницу снова.</string>
+    <string name="settings_leapmotor_cluster_test">Тест экрана DiPlay · 5 секунд</string>
+    <string name="settings_leapmotor_cluster_confirm">Изображение появилось в нужной области приборов? Подтвердите, чтобы сохранить экран и включить карту при следующем подключении.</string>
+    <string name="settings_leapmotor_cluster_unavailable">Этот экран не поддерживает Presentation. Выбор не сохранён.</string>
+</resources>

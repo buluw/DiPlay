@@ -63,9 +63,9 @@ class UpdateHomeAvailabilityTest {
 
     private fun release() = UpdateRelease(
         tagName = "v99.0.0",
-        apkName = "DiPlay.apk",
-        apkUrl = "https://example.com/DiPlay.apk",
-        checksumsUrl = "https://example.com/SHA256SUMS.txt",
+        apkName = "DiPlay-99.0.0-leapmotor.apk",
+        apkUrl = "https://github.com/buluw/DiPlay/releases/download/v99.0.0/DiPlay-99.0.0-leapmotor.apk",
+        checksumsUrl = "https://github.com/buluw/DiPlay/releases/download/v99.0.0/SHA256SUMS.txt",
     )
 
     private fun descendants(view: View): Sequence<View> = sequence {

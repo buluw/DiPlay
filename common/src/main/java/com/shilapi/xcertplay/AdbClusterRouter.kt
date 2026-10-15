@@ -12,6 +12,7 @@ internal object AdbClusterRouter {
 
     /** Known 5/5.1 displays win; the explicit legacy route may own the measured projection task. */
     fun enabled(context: Context): Boolean {
+        if (LeapmotorClusterRoute.configured(context)) return false
         if (DiLink51ClusterLayout.supported()) return false
         val public = ClusterMapPresentation.findDisplay(context)
         if (AirPlayPersistence.loadLegacyClusterEnabled(context)) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_cluster_target">Leapmotor メーターの表示先</string>
+    <string name="settings_leapmotor_cluster_none">未選択</string>
+    <string name="settings_leapmotor_cluster_hint">停車中にテストしてください。画面を選び、テスト画像を確認してから CarPlay に再接続します。独立した地図ストリームを使用し、メイン画面のミラーリングや純正メーターのモード変更は行いません。</string>
+    <string name="settings_leapmotor_cluster_missing">選択した画面が使用できないか、識別情報が変わりました。再選択してください。別の画面へ自動的に切り替わることはありません。</string>
+    <string name="settings_leapmotor_cluster_no_displays">使用可能なサブ画面がありません。純正メーターの投影モードを有効にし、このページを開き直してください。</string>
+    <string name="settings_leapmotor_cluster_test">DiPlay 画面テスト · 5 秒</string>
+    <string name="settings_leapmotor_cluster_confirm">テスト画像は目的のメーター投影領域に表示されましたか？確認すると画面を保存し、次の接続時に地図を有効にします。</string>
+    <string name="settings_leapmotor_cluster_unavailable">この画面では Presentation を表示できません。選択は保存されませんでした。</string>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_leapmotor_cluster_target">零跑儀表目標螢幕</string>
+    <string name="settings_leapmotor_cluster_none">未選擇</string>
+    <string name="settings_leapmotor_cluster_hint">請停車後測試。選擇螢幕並確認測試影像，再重新連接 CarPlay。使用獨立地圖串流，不鏡像主螢幕，也不切換原車儀表模式。</string>
+    <string name="settings_leapmotor_cluster_missing">已選螢幕無法使用或識別資訊已變更，請重新選擇；不會自動投放到其他螢幕。</string>
+    <string name="settings_leapmotor_cluster_no_displays">未發現可存取的副螢幕。請開啟原車儀表投影模式，再重新進入此頁面。</string>
+    <string name="settings_leapmotor_cluster_test">DiPlay 螢幕測試 · 5 秒</string>
+    <string name="settings_leapmotor_cluster_confirm">測試影像是否顯示在預期的儀表投影區域？確認後儲存此螢幕，並在下次連線時啟用地圖。</string>
+    <string name="settings_leapmotor_cluster_unavailable">此螢幕不允許 Presentation 投影，未儲存選擇。</string>
+</resources>

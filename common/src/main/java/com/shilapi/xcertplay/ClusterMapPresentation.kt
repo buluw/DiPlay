@@ -54,8 +54,12 @@ internal class ClusterMapPresentation(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (LeapmotorClusterRoute.configured(context)) {
+            window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
         val size = sizeOf(display)
-        val adaptive = DiLink51ClusterLayout.supported()
+        val adaptive = !LeapmotorClusterRoute.configured(context) && DiLink51ClusterLayout.supported()
         val plan = if (adaptive) DiLink51ClusterLayout.plan(size.x, size.y, theme) else null
         // The adaptive DiLink 5.1 layout follows the cluster's own contrast; elsewhere the cluster follows DiPlay's theme.
         val dark = if (plan != null) DiLink51ClusterLayout.dark(context, theme) else context.resolveAppNightNow()
@@ -202,6 +206,7 @@ internal class ClusterMapPresentation(
 
         /** Keep the 5/5.1 selection order, then try the measured DiLink 4 projection display. */
         fun findDisplay(context: Context, theme: DiLink51ClusterLayout.Theme = DiLink51ClusterLayout.theme(context)): Display? {
+            if (LeapmotorClusterRoute.configured(context)) return LeapmotorClusterRoute.findDisplay(context)
             val displays = context.getSystemService(DisplayManager::class.java)
                 ?.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION) ?: return null
             val name = DiLink51ClusterLayout.displayName(
@@ -231,6 +236,7 @@ internal class ClusterMapPresentation(
                 }.orEmpty()
 
         fun diagnosticReport(context: Context): String = buildString {
+            appendLine(LeapmotorClusterRoute.diagnosticReport(context))
             appendLine("clusterEnabled=${AirPlayPersistence.loadClusterMapEnabled(context)}")
             appendLine("navigationReceiverAvailable=${com.shilapi.xcertplay.hud.BydOutputSettings.navigationAvailable(context)}")
             appendLine("allDisplays=${describeDisplays(context)}")

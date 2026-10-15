@@ -89,6 +89,7 @@ import com.shilapi.xcertplay.update.UpdateChecksums
 import com.shilapi.xcertplay.update.UpdateClient
 import com.shilapi.xcertplay.update.UpdateRelease
 import com.shilapi.xcertplay.update.UpdateReleaseLookup
+import com.shilapi.xcertplay.update.UpdatePackageVerifier
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -168,6 +169,11 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
     private var appearanceRenderPending = false
     private var appearanceButtonFocusPending = false
     private var windowLearning: WindowKeyLearning? = null
+    private var leapmotorClusterPreview: android.app.Presentation? = null
+    private val endLeapmotorClusterPreview = Runnable {
+        leapmotorClusterPreview?.dismiss()
+        leapmotorClusterPreview = null
+    }
     private val windowLearningPresses = WheelKeyPresses()
     private val endWindowLearning = Runnable { cancelKeyLearning() }
     private var page = "home"
@@ -525,6 +531,8 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         }
     }
     override fun onPause() {
+        handler.removeCallbacks(endLeapmotorClusterPreview)
+        endLeapmotorClusterPreview.run()
         appearanceUpdatesResumed = false
         appearanceObserverRemoval?.invoke()
         appearanceObserverRemoval = null
@@ -2060,17 +2068,20 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
         // Cluster video does not require a BYD navigation broadcast receiver.
         filteredSection(content, SettingsSection.CLUSTER_MAP,
             getString(R.string.carplay_map_on_instrument_cluster_experimental), R.drawable.ic_dp_dashboard) { card ->
-            reconnectingToggle(card, getString(R.string.adb_cluster_activity_mode),
-                getString(R.string.adb_cluster_activity_description), AirPlayPersistence.loadAdbClusterEnabled(this)) {
-                AirPlayPersistence.saveAdbClusterEnabled(this, it)
-                ClusterActivityOutput.stopForSettings()
-                render()
-            }
-            reconnectingToggle(card, getString(R.string.platform21_cluster_mode),
-                getString(R.string.platform21_cluster_description), AirPlayPersistence.loadLegacyClusterEnabled(this)) {
-                AirPlayPersistence.saveLegacyClusterEnabled(this, it)
-                ClusterActivityOutput.stopForSettings()
-                render()
+            leapmotorClusterControls(card)
+            if (!LeapmotorClusterRoute.configured(this)) {
+                reconnectingToggle(card, getString(R.string.adb_cluster_activity_mode),
+                    getString(R.string.adb_cluster_activity_description), AirPlayPersistence.loadAdbClusterEnabled(this)) {
+                    AirPlayPersistence.saveAdbClusterEnabled(this, it)
+                    ClusterActivityOutput.stopForSettings()
+                    render()
+                }
+                reconnectingToggle(card, getString(R.string.platform21_cluster_mode),
+                    getString(R.string.platform21_cluster_description), AirPlayPersistence.loadLegacyClusterEnabled(this)) {
+                    AirPlayPersistence.saveLegacyClusterEnabled(this, it)
+                    ClusterActivityOutput.stopForSettings()
+                    render()
+                }
             }
             val adbCluster = AdbClusterRouter.enabled(this)
             if (adbCluster) {
@@ -2089,11 +2100,12 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             }
             val clusterDisplay = ClusterMapPresentation.findDisplay(this)
             val clusterSize = clusterDisplay?.let { ClusterMapPresentation.sizeOf(it) }
-            val diLink4 = adbCluster || (clusterDisplay != null && clusterSize != null &&
-                DiLink4ClusterDisplay.matches(clusterDisplay.name, clusterSize.x, clusterSize.y))
+            val diLink4 = !LeapmotorClusterRoute.configured(this) && (adbCluster || (clusterDisplay != null && clusterSize != null &&
+                DiLink4ClusterDisplay.matches(clusterDisplay.name, clusterSize.x, clusterSize.y)))
             val clusterMapEnabled = AirPlayPersistence.loadClusterMapEnabled(this)
             reconnectingToggle(card, getString(R.string.carplay_map_on_instrument_cluster_experimental),
-                if (clusterDisplay != null || adbCluster) getString(R.string.shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c)
+                if (LeapmotorClusterRoute.configured(this)) getString(R.string.settings_leapmotor_cluster_hint)
+                else if (clusterDisplay != null || adbCluster) getString(R.string.shows_the_iphone_s_cluster_map_on_the_instrument_cluster_c)
                 else getString(R.string.shows_the_iphone_s_cluster_map_virtual_stream_description),
                 clusterMapEnabled) {
                 AirPlayPersistence.saveClusterMapEnabled(this, it)
@@ -2136,7 +2148,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                     }
                 }
                 if (clusterDisplay != null || adbCluster) {
-                    if (DiLink51ClusterLayout.supported() && !adbCluster) {
+                    if (!LeapmotorClusterRoute.configured(this) && DiLink51ClusterLayout.supported() && !adbCluster) {
                         val automatic = DiLink51ClusterLayout.automatic(this)
                         toggle(card, getString(R.string.follow_instrument_theme_and_map_card),
                             getString(R.string.show_the_side_map_only_when_its_card_is_open_and_switch_to), automatic) {
@@ -2513,6 +2525,9 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
 
     private fun updateRow(): View {
         val container = column().apply { setPadding(0, dp(12), 0, 0) }
+        container.addView(button("GitHub · buluw/DiPlay / leapmotor", false) {
+            runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(UpdateCatalog.RELEASES_PAGE))) }
+        }, matchButton(0, 60))
         updateMessage?.let { container.addView(label(it, 14, MUTED)) }
         when (updateStage) {
             UpdateStage.IDLE, UpdateStage.FAILED ->
@@ -2620,6 +2635,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                 if (!UpdateChecksums.matches(expected, release.apkName, actual)) {
                     throw IOException("Checksum mismatch for ${release.apkName}")
                 }
+                UpdatePackageVerifier.verify(applicationContext, apkFile)
                 apkFile
             }.onFailure { directory.deleteRecursively() }
             val saved = outcome.getOrNull()?.let { UpdateApkExport.copy(applicationContext, it) }
@@ -5296,6 +5312,70 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
 
     private fun refreshLeapmotorWheelStatus() {
         leapmotorWheelStatus?.text = leapmotorWheelDiagnosticText()
+    }
+
+    private fun leapmotorClusterControls(card: LinearLayout) {
+        val selected = LeapmotorClusterRoute.selected(this)
+        val title = getString(R.string.settings_leapmotor_cluster_target)
+        val value = selected?.label() ?: getString(R.string.settings_leapmotor_cluster_none)
+        card.addView(button(title + " · " + value, false) {
+            val displays = LeapmotorClusterRoute.candidates(this)
+            val labels = listOf(getString(R.string.settings_leapmotor_cluster_none)) +
+                displays.map { LeapmotorClusterRoute.identity(it).label() }
+            appDialogBuilder().setTitle(title).setItems(labels.toTypedArray()) { _, index ->
+                if (index == 0) {
+                    LeapmotorClusterRoute.save(this, null)
+                    markReconnectNeeded()
+                    render()
+                } else previewLeapmotorCluster(displays[index - 1])
+            }.show()
+        }.apply { minHeight = dp(60) }, matchButton(SETTINGS_BLOCK_GAP_DP, 60).apply {
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
+        })
+        card.addView(label(getString(R.string.settings_leapmotor_cluster_hint), 14, MUTED))
+        if (selected != null && LeapmotorClusterRoute.findDisplay(this) == null) {
+            card.addView(label(getString(R.string.settings_leapmotor_cluster_missing), 14, WARNING))
+        } else if (LeapmotorClusterRoute.candidates(this).isEmpty()) {
+            card.addView(label(getString(R.string.settings_leapmotor_cluster_no_displays), 14, MUTED))
+        }
+    }
+
+    private fun previewLeapmotorCluster(display: android.view.Display) {
+        val identity = LeapmotorClusterRoute.identity(display)
+        handler.removeCallbacks(endLeapmotorClusterPreview)
+        endLeapmotorClusterPreview.run()
+        val preview = android.app.Presentation(this, display)
+        try {
+            preview.setContentView(TextView(preview.context).apply {
+                text = getString(R.string.settings_leapmotor_cluster_test) + "\n" + identity.label()
+                textSize = 28f
+                gravity = Gravity.CENTER
+                setTextColor(Color.WHITE)
+                setBackgroundColor(Color.BLACK)
+            })
+            preview.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            preview.show()
+            leapmotorClusterPreview = preview
+            handler.postDelayed(endLeapmotorClusterPreview, 5_000L)
+            appDialogBuilder().setTitle(getString(R.string.settings_leapmotor_cluster_target))
+                .setMessage(getString(R.string.settings_leapmotor_cluster_confirm))
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    if (display.isValid && identity.accepts(LeapmotorClusterRoute.identity(display))) {
+                        LeapmotorClusterRoute.save(this, display)
+                        AirPlayPersistence.saveClusterMapEnabled(this, true)
+                        markReconnectNeeded()
+                        render()
+                    } else toast(getString(R.string.settings_leapmotor_cluster_missing))
+                }.setNegativeButton(android.R.string.cancel, null)
+                .setOnDismissListener {
+                    handler.removeCallbacks(endLeapmotorClusterPreview)
+                    endLeapmotorClusterPreview.run()
+                }.show()
+        } catch (_: RuntimeException) {
+            runCatching { preview.dismiss() }
+            toast(getString(R.string.settings_leapmotor_cluster_unavailable))
+        }
     }
 
     private fun leapmotorWheelDiagnosticText(): String {
