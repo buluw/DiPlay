@@ -1,6 +1,6 @@
 # DiPlay 零跑专用适配分支（Leapmotor）
 
-本仓库在上游 **DiPlay v0.2.19** 基础上，提供零跑车机的 CarPlay 适配，重点包括 **零跑方向盘媒体控制**、**2021–2023 款 C11 Dock / 上下栏布局**和零跑名称、车标。
+本仓库在上游 **DiPlay v0.2.20** 基础上，提供零跑车机的 CarPlay 适配，重点包括 **零跑方向盘媒体控制**、**2021–2023 款 C11 Dock / 上下栏布局**和零跑名称、车标。
 
 [下载零跑 APK](https://github.com/buluw/DiPlay/releases/tag/v0.2.19.1) · [发布说明](docs/RELEASE-NOTES-0.2.19.1.md) · [适配与验证记录](docs/LEAPMOTOR_WHEEL_TEST.md) · [繁體中文](README.zh-TW.md)
 
@@ -21,6 +21,10 @@
 - **零跑外观**：应用显示名为“DiPlay 零跑”，CarPlay 返回原车按钮使用零跑图标及“Leapmotor”名称。
 - **独立诊断**：记录开关默认关闭；开启才采集，关闭不影响方控。关闭记录后重连仍保留已采集结果，可手动导出。
 - **布局修复**：修复保留系统栏时的侧栏拖动偏移，并处理设置界面与安全区编辑器的键盘避让。
+
+## 当前开发源码
+
+源码已合并上游 v0.2.20，内部版本为 0.2.20-leapmotor / versionCode 39；保留零跑适配，新增仪表目标屏选择及本仓库自助更新渠道。该源码尚未发布，现有 Release 仍如下表。详见 [仪表与更新说明](docs/LEAPMOTOR_CLUSTER_AND_UPDATES.md)。
 
 ## 当前发布版本
 

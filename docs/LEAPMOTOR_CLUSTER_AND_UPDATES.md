@@ -19,7 +19,7 @@
 
 ## 零跑更新渠道
 
-- 手动检查、后台检查和 Release 页面统一指向 buluw/DiPlay；代码发布来源为 leapmotor 分支。不会自动合入上游 v0.2.20。
+- 手动检查、后台检查和 Release 页面统一指向 buluw/DiPlay；代码发布来源为 leapmotor 分支。源码已合并上游 v0.2.20；应用更新仍只使用零跑分发渠道。
 - 每个 Release 只接受一个符合命名规则的零跑 APK：DiPlay-版本-leapmotor.apk，或附加八位日期的同类名称。多份匹配 APK 时不猜选。
 - 支持同一 Release 中的 SHA256SUMS.txt，以及严格同名的 APK.sha256。校验内容必须包含对应 APK 文件名及 SHA-256；不能只有一个无文件名的摘要。
 - 支持三段和四段版本号，按数字比较。现有 v0.2.19.1 沿用内部 0.2.19-leapmotor / versionCode 38，同一 APK 不会被反复提示更新。

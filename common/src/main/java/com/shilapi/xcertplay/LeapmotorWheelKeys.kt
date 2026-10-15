@@ -77,12 +77,15 @@ internal object LeapmotorWheelKeys {
             .putBoolean("diagnostics_enabled", enabled).apply()
         if (enabled && !state.diagnosticsEnabled) clearHistory()
         state = state.copy(diagnosticsEnabled = enabled)
+        WheelKeyLog.setRecording(enabled)
+        if (enabled && WheelKeyService.connected()) WheelKeyLog.bound()
     }
 
     @Synchronized
     fun initialize(context: Context) {
         app = context.applicationContext
         state = state.copy(enabled = enabled(context), diagnosticsEnabled = diagnosticsEnabled(context))
+        WheelKeyLog.setRecording(state.diagnosticsEnabled)
         updateRegistration()
         publishMediaInfo()
     }
@@ -127,6 +130,7 @@ internal object LeapmotorWheelKeys {
 
     @Synchronized
     fun clearHistory() {
+        WheelKeyLog.reset()
         state = state.copy(received = 0, submitted = 0, events = emptyList(),
             mediaReport = MediaReportState.WAITING, mediaReports = 0,
             mediaReportTimeMillis = null, reportedPlaying = null, mediaReportError = null)

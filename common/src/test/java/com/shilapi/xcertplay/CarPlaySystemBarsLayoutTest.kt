@@ -106,8 +106,8 @@ class CarPlaySystemBarsLayoutTest {
         applyInsets(80, 120)
         layout(1920, 1080)
         val texture = field("videoView") as TextureView
-        activity.javaClass.getDeclaredMethod("useFallbackVideoSurface", TextureView::class.java)
-            .apply { isAccessible = true }.invoke(activity, texture)
+        activity.javaClass.getDeclaredMethod("useFallbackVideoSurface", TextureView::class.java, String::class.java)
+            .apply { isAccessible = true }.invoke(activity, texture, null)
         layout(1920, 1080)
         assertViewport(0, 80, 1920, 960)
         assertNotNull(field("fallbackVideoView"))
@@ -207,7 +207,8 @@ class CarPlaySystemBarsLayoutTest {
         layout(1920, 1080)
         val input = field("remoteMfiServerInput") as View
         val panel = menu.getChildAt(0) as FrameLayout
-        val scroll = descendants(panel).filterIsInstance<ScrollView>().single()
+        // The grouped menu now has a separate category-navigation ScrollView.
+        val scroll = field("settingsMenuContentScroll") as ScrollView
         val originalScrollHeight = scroll.height
         assertTrue(input.requestFocus())
         layout(1920, 1080)
