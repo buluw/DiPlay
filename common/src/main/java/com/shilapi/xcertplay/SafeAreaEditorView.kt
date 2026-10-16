@@ -48,6 +48,7 @@ internal class SafeAreaEditorView(
     private var activeEdge: Edge? = null
     var interactive = true
     var dimOutside = true
+    var compactCoordinates = false
     var onRectChanged: ((SafeAreaRect) -> Unit)? = null
 
     init {
@@ -126,6 +127,13 @@ internal class SafeAreaEditorView(
         canvas.drawLine(0f, bottom.coerceIn(inset, height - inset), width, bottom.coerceIn(inset, height - inset), linePaint)
 
         val source = currentRectForSource() ?: safe
+        if (compactCoordinates) {
+            val start = "(" + source.left + ", " + source.top + ")"
+            val end = "(" + source.right + ", " + source.bottom + ")"
+            drawLabel(canvas, start, left + 8f * density, top + 20f * density)
+            drawLabel(canvas, end, right - textPaint.measureText(end) - 8f * density, bottom - 8f * density)
+            return
+        }
         drawLabel(canvas, "x=${source.left}", left + 8f * density, top + 20f * density)
         drawLabel(canvas, "x=${source.right}", right + 8f * density, bottom - 8f * density)
         drawLabel(canvas, "y=${source.top}", left + 8f * density, top - 8f * density)

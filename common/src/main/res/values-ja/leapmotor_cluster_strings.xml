@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">Leapmotor メーターの表示先</string>
     <string name="settings_leapmotor_cluster_none">未選択</string>
-    <string name="settings_leapmotor_cluster_hint">停車中にテストしてください。画面を選び、テスト画像を確認してから CarPlay に再接続します。独立した地図ストリームを使用し、メイン画面のミラーリングや純正メーターのモード変更は行いません。</string>
+    <string name="settings_leapmotor_cluster_hint">停車中に対象画面を確認し、地図の表示領域を調整してください。独立した地図またはメイン画面の複製を選び、CarPlay を再接続します。車両標準のメーター表示モードは変更しません。</string>
     <string name="settings_leapmotor_cluster_missing">選択した画面が使用できないか、識別情報が変わりました。再選択してください。別の画面へ自動的に切り替わることはありません。</string>
     <string name="settings_leapmotor_cluster_no_displays">使用可能なサブ画面がありません。純正メーターの投影モードを有効にし、このページを開き直してください。</string>
     <string name="settings_leapmotor_cluster_test">DiPlay 画面テスト · 5 秒</string>
     <string name="settings_leapmotor_cluster_confirm">テスト画像は目的のメーター投影領域に表示されましたか？確認すると画面を保存し、次の接続時に地図を有効にします。</string>
     <string name="settings_leapmotor_cluster_unavailable">この画面では Presentation を表示できません。選択は保存されませんでした。</string>
+    <string name="settings_leapmotor_cluster_viewport">メーターの表示領域</string>
+    <string name="settings_leapmotor_cluster_source">メーターの映像ソース</string>
+    <string name="settings_leapmotor_cluster_independent">独立した地図</string>
+    <string name="settings_leapmotor_cluster_mirror">メイン画面を複製</string>
+    <string name="settings_leapmotor_cluster_source_hint">独立地図は iPhone のメーターチャンネルを使用します。メイン画面のミラーは CarPlay の画面とアプリ切り替えに追従し、追加の画面を要求しません。表示範囲は全体または切り抜きを選べます。保存後に CarPlay を再接続してください。</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">1920×720 では右側の 720×720 を初期表示範囲にします。停車中に「右側の正方形」を選び、四辺を動かして見える地図領域に合わせてください。保存後に CarPlay を再接続してください。</string>
+    <string name="settings_leapmotor_cluster_right_square">右側の正方形</string>
+    <string name="settings_leapmotor_cluster_full_canvas">キャンバス全体</string>
+    <string name="settings_leapmotor_cluster_framing">メーター映像の表示範囲</string>
+    <string name="settings_leapmotor_cluster_fit">全体を表示</string>
+    <string name="settings_leapmotor_cluster_crop">切り抜き</string>
+    <string name="settings_leapmotor_cluster_framing_hint">これらの設定は車載側でメーター映像を切り抜きます。iPhone の車両マーカーは動かしません。中心位置と拡大率は切り抜きモードでのみ有効です。保存後に CarPlay を再接続してください。</string>
+    <string name="settings_leapmotor_cluster_crop_x">切り抜き中心 · 水平</string>
+    <string name="settings_leapmotor_cluster_crop_y">切り抜き中心 · 垂直</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">切り抜き拡大率</string>
 </resources>

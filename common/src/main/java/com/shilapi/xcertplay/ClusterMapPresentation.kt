@@ -28,6 +28,8 @@ import android.widget.ProgressBar
 import com.shilapi.xcertplay.airplay.CarPlayClusterDisplay
 import com.shilapi.xcertplay.host.R
 import com.shilapi.xcertplay.hud.ClusterTurnGuidance
+import com.shilapi.xcertplay.media.AndroidMediaSink
+import java.lang.ref.WeakReference
 
 /**
  * Shows CarPlay's instrument-cluster stream on a BYD cluster projection display.
@@ -40,6 +42,7 @@ internal class ClusterMapPresentation(
     context: Context,
     display: Display,
     private val theme: DiLink51ClusterLayout.Theme = DiLink51ClusterLayout.theme(context),
+    private val leapmotor: LeapmotorClusterRoute.Configuration? = LeapmotorClusterRoute.configuration(context),
     private val onSurface: (Surface?) -> Unit,
 ) : Presentation(context, display) {
     // The placeholder until the map arrives: a small spinner.
@@ -47,6 +50,11 @@ internal class ClusterMapPresentation(
     private var turnCardView: ClusterTurnCardView? = null
     private var videoView: View? = null
     private var streamActive = false
+    private var viewportFrame: LeapmotorClusterViewportFrame? = null
+    private var mirrorAspect: Double? = null
+    private var sourceSize: Pair<Int, Int>? = null
+    private var videoGeometryGeneration = 0L
+    val leapmotorConfiguration: LeapmotorClusterRoute.Configuration? get() = leapmotor
     var outputSurface: Surface? = null
         private set
     var mapVisible = true
@@ -54,12 +62,15 @@ internal class ClusterMapPresentation(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (LeapmotorClusterRoute.configured(context)) {
+        if (leapmotor != null) {
             window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         }
         val size = sizeOf(display)
-        val adaptive = !LeapmotorClusterRoute.configured(context) && DiLink51ClusterLayout.supported()
+        val adaptive = leapmotor == null && DiLink51ClusterLayout.supported()
         val plan = if (adaptive) DiLink51ClusterLayout.plan(size.x, size.y, theme) else null
         // The adaptive DiLink 5.1 layout follows the cluster's own contrast; elsewhere the cluster follows DiPlay's theme.
         val dark = if (plan != null) DiLink51ClusterLayout.dark(context, theme) else context.resolveAppNightNow()
@@ -76,7 +87,16 @@ internal class ClusterMapPresentation(
             FrameLayout.LayoutParams(plan.width, plan.height, Gravity.TOP or Gravity.LEFT).apply {
                 leftMargin = plan.left; topMargin = plan.top
             }
-        if (plan != null) {
+        if (leapmotor != null) {
+            val texture = LeapmotorClusterVideoTexture(context, leapmotor.framing) { surface ->
+                outputSurface = surface
+                onSurface(surface)
+            }
+            val initial = sourceSize ?: (leapmotor.viewport.width to leapmotor.viewport.height)
+            texture.setSourceSize(initial.first, initial.second)
+            root.addView(texture, videoParams)
+            videoView = texture
+        } else if (plan != null) {
             val textureView = TextureView(context)
             fun transform() {
                 textureView.setTransform(Matrix().apply {
@@ -141,8 +161,10 @@ internal class ClusterMapPresentation(
         root.addView(waitingLabel, FrameLayout.LayoutParams(videoParams))
         turnCardView = ClusterTurnCardView(context).apply { visibility = View.GONE }
         root.addView(turnCardView, FrameLayout.LayoutParams(-1, -1))
-        root.addView(ClusterMusicView(context), FrameLayout.LayoutParams(videoParams))
-        root.addView(ClusterSpeedometerView(context), FrameLayout.LayoutParams(-1, -1))
+        if (leapmotor?.mirrorMain != true) {
+            root.addView(ClusterMusicView(context), FrameLayout.LayoutParams(videoParams))
+            root.addView(ClusterSpeedometerView(context), FrameLayout.LayoutParams(-1, -1))
+        }
         // Start with the placeholder visible; SurfaceView would otherwise cover the light
         // backdrop with an empty black surface before the first stream notification.
         // SurfaceView ignores fractional alpha before API 34. Keep its decoder surface
@@ -152,7 +174,48 @@ internal class ClusterMapPresentation(
             alpha = if (streamActive) 0f else 1f
             visibility = if (streamActive) View.GONE else View.VISIBLE
         }
-        setContentView(root)
+        if (leapmotor == null) setContentView(root) else {
+            val key = leapmotor.identity
+            val frame = LeapmotorClusterViewportFrame(context, key.width, key.height, leapmotor.viewport, root)
+            frame.mirrorAspect = if (!leapmotor.framing.crop) mirrorAspect else null
+            viewportFrame = frame
+            setContentView(frame)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (leapmotor != null) {
+            window?.setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT)
+            window?.setGravity(Gravity.TOP or Gravity.LEFT)
+        }
+    }
+
+    fun setVideoSourceSize(width: Int, height: Int) {
+        if (leapmotor == null || width <= 0 || height <= 0) return
+        sourceSize = width to height
+        mirrorAspect = width.toDouble() / height
+        (videoView as? LeapmotorClusterVideoTexture)?.setSourceSize(width, height)
+        viewportFrame?.mirrorAspect = if (leapmotor.framing.crop) null else mirrorAspect
+        Log.i(TAG, "leapmotor source=" + sourceSize + " viewport=" + leapmotor.viewport +
+            " framing=" + leapmotor.framing)
+    }
+
+    fun bindVideoGeometry(sink: AndroidMediaSink, type: Int) {
+        if (leapmotor == null) return
+        val owner = WeakReference(this)
+        val source = WeakReference(sink)
+        val generation = ++videoGeometryGeneration
+        val main = android.os.Handler(android.os.Looper.getMainLooper())
+        sink.setVideoSizeChangedListener { stream, _, _ ->
+            if (stream == type) main.post {
+                val current = owner.get()?.takeIf { it.isShowing && it.videoGeometryGeneration == generation }
+                val size = source.get()?.videoSize(type)
+                if (current != null && size != null) current.setVideoSourceSize(size.first, size.second)
+            }
+        }
+        val (width, height) = sink.videoSize(type)
+        setVideoSourceSize(width, height)
     }
 
     /**

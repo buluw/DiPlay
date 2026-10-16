@@ -5,16 +5,17 @@ import android.view.View
 import android.view.ViewGroup
 
 /** Fits the whole 1920×720 editor inside the dialog's available preview space. */
-internal class ClusterSafeAreaPreviewFrame(context: Context, val editor: SafeAreaEditorView) : ViewGroup(context) {
+internal class ClusterSafeAreaPreviewFrame(context: Context, val editor: SafeAreaEditorView,
+    private val sourceWidth: Int = 1920, private val sourceHeight: Int = 720) : ViewGroup(context) {
     init { addView(editor) }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val width = View.MeasureSpec.getSize(widthMeasureSpec)
         val height = View.MeasureSpec.getSize(heightMeasureSpec)
         setMeasuredDimension(width, height)
-        val fit = minOf(width / 1920f, height / 720f)
-        editor.measure(View.MeasureSpec.makeMeasureSpec((1920 * fit).toInt(), View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec((720 * fit).toInt(), View.MeasureSpec.EXACTLY))
+        val fit = minOf(width / sourceWidth.toFloat(), height / sourceHeight.toFloat())
+        editor.measure(View.MeasureSpec.makeMeasureSpec((sourceWidth * fit).toInt(), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec((sourceHeight * fit).toInt(), View.MeasureSpec.EXACTLY))
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

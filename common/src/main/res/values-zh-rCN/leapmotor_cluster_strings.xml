@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">零跑仪表目标屏幕</string>
     <string name="settings_leapmotor_cluster_none">未选择</string>
-    <string name="settings_leapmotor_cluster_hint">请停车后测试。选择屏幕并确认测试图像，再重新连接 CarPlay。使用独立地图流，不镜像主屏，也不切换原车仪表模式。</string>
+    <string name="settings_leapmotor_cluster_hint">请停车后确认目标屏幕并校准地图可见区域，选择独立地图或同步主屏后重新连接 CarPlay。不会切换原车仪表模式。</string>
     <string name="settings_leapmotor_cluster_missing">已选屏幕不可用或身份已变化，请重新选择；不会自动改投其他屏幕。</string>
     <string name="settings_leapmotor_cluster_no_displays">未发现可访问的副屏。请打开原车仪表投屏模式，再重新进入此页面。</string>
     <string name="settings_leapmotor_cluster_test">DiPlay 屏幕测试 · 5 秒</string>
     <string name="settings_leapmotor_cluster_confirm">测试图像是否显示在预期的仪表投屏区域？确认后保存此屏幕，并在下次连接时启用地图。</string>
     <string name="settings_leapmotor_cluster_unavailable">此屏幕不允许 Presentation 投屏，未保存选择。</string>
+    <string name="settings_leapmotor_cluster_viewport">仪表可见区域</string>
+    <string name="settings_leapmotor_cluster_source">仪表画面来源</string>
+    <string name="settings_leapmotor_cluster_independent">独立地图</string>
+    <string name="settings_leapmotor_cluster_mirror">同步主屏</string>
+    <string name="settings_leapmotor_cluster_source_hint">独立地图使用手机仪表通道；同步主屏复制主屏 CarPlay 内容及应用切换，不请求第二块手机显示屏。本地取景可选择完整画面或裁切。保存后需重连 CarPlay。</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">1920×720 屏幕默认使用右侧 720×720 窗口。请停车后用“右侧正方形”预设，再拖动四条边线校准可见区域。保存后需重连 CarPlay。</string>
+    <string name="settings_leapmotor_cluster_right_square">右侧正方形</string>
+    <string name="settings_leapmotor_cluster_full_canvas">整张画布</string>
+    <string name="settings_leapmotor_cluster_framing">仪表本地取景</string>
+    <string name="settings_leapmotor_cluster_fit">完整画面</string>
+    <string name="settings_leapmotor_cluster_crop">局部取景</string>
+    <string name="settings_leapmotor_cluster_framing_hint">这些控制在车机本地裁切仪表视频，不调整手机车标。取景中心和放大仅在“局部取景”模式生效。保存后需重连 CarPlay。</string>
+    <string name="settings_leapmotor_cluster_crop_x">取景中心 · 水平</string>
+    <string name="settings_leapmotor_cluster_crop_y">取景中心 · 垂直</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">取景放大</string>
 </resources>

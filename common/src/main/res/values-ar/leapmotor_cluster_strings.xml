@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">شاشة عدادات Leapmotor المستهدفة</string>
     <string name="settings_leapmotor_cluster_none">لم يتم الاختيار</string>
-    <string name="settings_leapmotor_cluster_hint">أوقف السيارة قبل الاختبار. اختر الشاشة وأكد صورة الاختبار ثم أعد توصيل CarPlay. يستخدم بث خريطة منفصلاً دون نسخ الشاشة الرئيسية أو تغيير وضع العدادات الأصلي.</string>
+    <string name="settings_leapmotor_cluster_hint">أوقف السيارة، ثم أكد الشاشة المستهدفة واضبط منطقة الخريطة المرئية. اختر الخريطة المستقلة أو نسخ الشاشة الرئيسية ثم أعد توصيل CarPlay. لن يتغير وضع العدادات الأصلي.</string>
     <string name="settings_leapmotor_cluster_missing">الشاشة المختارة غير متاحة أو تغيرت هويتها. اخترها مجدداً؛ لن يتم استخدام شاشة أخرى تلقائياً.</string>
     <string name="settings_leapmotor_cluster_no_displays">لا توجد شاشة ثانوية متاحة. فعّل وضع العرض على العدادات الأصلي ثم أعد فتح هذه الصفحة.</string>
     <string name="settings_leapmotor_cluster_test">اختبار شاشة DiPlay · 5 ثوانٍ</string>
     <string name="settings_leapmotor_cluster_confirm">هل ظهرت الصورة في مساحة العرض المطلوبة على العدادات؟ أكد لحفظ الشاشة وتفعيل الخريطة عند الاتصال التالي.</string>
     <string name="settings_leapmotor_cluster_unavailable">لا تسمح هذه الشاشة بعرض Presentation. لم يُحفظ الاختيار.</string>
+    <string name="settings_leapmotor_cluster_viewport">منطقة العدادات المرئية</string>
+    <string name="settings_leapmotor_cluster_source">مصدر صورة العدادات</string>
+    <string name="settings_leapmotor_cluster_independent">خريطة مستقلة</string>
+    <string name="settings_leapmotor_cluster_mirror">نسخ الشاشة الرئيسية</string>
+    <string name="settings_leapmotor_cluster_source_hint">تستخدم الخريطة المستقلة قناة لوحة العدادات في الهاتف. تتبع المرآة صورة CarPlay الرئيسية وتبديل التطبيقات دون طلب شاشة ثانية. يمكن عرض الصورة كاملة أو اقتصاصها محليًا. احفظ ثم أعد توصيل CarPlay.</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">تستخدم شاشة 1920×720 افتراضيًا نافذة 720×720 على اليمين. أثناء التوقف، اختر المربع الأيمن واضبط الحواف الأربع لتناسب منطقة الخريطة المرئية. احفظ ثم أعد توصيل CarPlay.</string>
+    <string name="settings_leapmotor_cluster_right_square">المربع الأيمن</string>
+    <string name="settings_leapmotor_cluster_full_canvas">المساحة الكاملة</string>
+    <string name="settings_leapmotor_cluster_framing">تأطير لوحة العدادات محليًا</string>
+    <string name="settings_leapmotor_cluster_fit">الصورة كاملة</string>
+    <string name="settings_leapmotor_cluster_crop">اقتصاص الصورة</string>
+    <string name="settings_leapmotor_cluster_framing_hint">تقتص هذه الإعدادات الفيديو محليًا على لوحة العدادات، ولا تحرك علامة السيارة في الهاتف. يعمل المركز والتكبير في وضع الاقتصاص فقط. احفظ ثم أعد توصيل CarPlay.</string>
+    <string name="settings_leapmotor_cluster_crop_x">مركز الاقتصاص · أفقي</string>
+    <string name="settings_leapmotor_cluster_crop_y">مركز الاقتصاص · عمودي</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">تكبير الاقتصاص</string>
 </resources>

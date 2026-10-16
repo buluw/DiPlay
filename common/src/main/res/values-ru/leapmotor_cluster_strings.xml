@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">Экран приборов Leapmotor</string>
     <string name="settings_leapmotor_cluster_none">Не выбран</string>
-    <string name="settings_leapmotor_cluster_hint">Проводите проверку на стоянке. Выберите экран, подтвердите изображение и подключите CarPlay заново. Используется отдельный поток карты без зеркалирования главного экрана и смены штатного режима приборов.</string>
+    <string name="settings_leapmotor_cluster_hint">На стоянке подтвердите экран и настройте видимую область карты. Выберите отдельную карту или копию главного экрана и переподключите CarPlay. Режим штатной панели не меняется.</string>
     <string name="settings_leapmotor_cluster_missing">Выбранный экран недоступен или изменились его параметры. Выберите его заново; другой экран автоматически не используется.</string>
     <string name="settings_leapmotor_cluster_no_displays">Доступных дополнительных экранов нет. Включите штатный режим проекции приборов и откройте эту страницу снова.</string>
     <string name="settings_leapmotor_cluster_test">Тест экрана DiPlay · 5 секунд</string>
     <string name="settings_leapmotor_cluster_confirm">Изображение появилось в нужной области приборов? Подтвердите, чтобы сохранить экран и включить карту при следующем подключении.</string>
     <string name="settings_leapmotor_cluster_unavailable">Этот экран не поддерживает Presentation. Выбор не сохранён.</string>
+    <string name="settings_leapmotor_cluster_viewport">Видимая область приборной панели</string>
+    <string name="settings_leapmotor_cluster_source">Источник изображения панели</string>
+    <string name="settings_leapmotor_cluster_independent">Отдельная карта</string>
+    <string name="settings_leapmotor_cluster_mirror">Копия главного экрана</string>
+    <string name="settings_leapmotor_cluster_source_hint">Отдельная карта использует канал приборной панели телефона. Зеркало повторяет основной экран CarPlay и смену приложений, не запрашивая второй экран. Локально можно показать весь кадр или его часть. Сохраните и переподключите CarPlay.</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">Для экрана 1920×720 по умолчанию используется правое окно 720×720. На стоянке выберите «Правый квадрат» и подгоните четыре границы под видимую карту. Сохраните и переподключите CarPlay.</string>
+    <string name="settings_leapmotor_cluster_right_square">Правый квадрат</string>
+    <string name="settings_leapmotor_cluster_full_canvas">Весь холст</string>
+    <string name="settings_leapmotor_cluster_framing">Локальное кадрирование</string>
+    <string name="settings_leapmotor_cluster_fit">Весь кадр</string>
+    <string name="settings_leapmotor_cluster_crop">Обрезка кадра</string>
+    <string name="settings_leapmotor_cluster_framing_hint">Эти настройки обрезают видео локально на приборной панели и не перемещают маркер телефона. Центр и масштаб действуют только при обрезке. Сохраните и переподключите CarPlay.</string>
+    <string name="settings_leapmotor_cluster_crop_x">Центр обрезки · по горизонтали</string>
+    <string name="settings_leapmotor_cluster_crop_y">Центр обрезки · по вертикали</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">Масштаб обрезки</string>
 </resources>

@@ -1218,7 +1218,8 @@ object AirPlayPersistence {
         overlaySettingsListener?.invoke()
     }
 
-    fun loadClusterMapScalePercent(context: Context): Int = CarPlayClusterDisplay.STREAM_SCALE_PERCENT.let { default ->
+    fun loadClusterMapScalePercent(context: Context): Int =
+        (if (LeapmotorClusterRoute.configured(context)) 100 else CarPlayClusterDisplay.STREAM_SCALE_PERCENT).let { default ->
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_CLUSTER_MAP_SCALE, default)
             .takeIf { it in CarPlayClusterDisplay.scalePresets } ?: default
     }

@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">Leapmotor target screen</string>
     <string name="settings_leapmotor_cluster_none">Not selected</string>
-    <string name="settings_leapmotor_cluster_hint">Park before testing. Choose the screen, confirm the test image, then reconnect CarPlay. Uses the separate map stream; it does not mirror the main screen or switch the OEM instrument mode.</string>
+    <string name="settings_leapmotor_cluster_hint">While parked, confirm the target screen and calibrate its visible map area. Choose independent map or main-screen mirroring, then reconnect CarPlay. This does not change the OEM cluster mode.</string>
     <string name="settings_leapmotor_cluster_missing">Selected screen is unavailable or its identity changed. Select it again; no other screen will be used.</string>
     <string name="settings_leapmotor_cluster_no_displays">No accessible secondary screen. Enable the original instrument projection mode, then reopen this page.</string>
     <string name="settings_leapmotor_cluster_test">DiPlay screen test · 5 seconds</string>
     <string name="settings_leapmotor_cluster_confirm">Did the test image appear on the intended instrument projection area? Confirm to save this screen and enable the map at the next connection.</string>
     <string name="settings_leapmotor_cluster_unavailable">This screen cannot show a Presentation. The selection was not saved.</string>
+    <string name="settings_leapmotor_cluster_viewport">Visible cluster area</string>
+    <string name="settings_leapmotor_cluster_source">Cluster picture source</string>
+    <string name="settings_leapmotor_cluster_independent">Independent map</string>
+    <string name="settings_leapmotor_cluster_mirror">Mirror main screen</string>
+    <string name="settings_leapmotor_cluster_source_hint">Independent map uses the phone cluster channel. Mirror follows the main CarPlay picture and app changes without requesting a second phone display. Local framing can show the full picture or a crop. Save, then reconnect CarPlay.</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">A 1920×720 screen defaults to the right 720×720 window. Start with Right square, then adjust the four edges to the visible map area while parked. Save, then reconnect CarPlay.</string>
+    <string name="settings_leapmotor_cluster_right_square">Right square</string>
+    <string name="settings_leapmotor_cluster_full_canvas">Whole canvas</string>
+    <string name="settings_leapmotor_cluster_framing">Local cluster framing</string>
+    <string name="settings_leapmotor_cluster_fit">Full picture</string>
+    <string name="settings_leapmotor_cluster_crop">Crop picture</string>
+    <string name="settings_leapmotor_cluster_framing_hint">These controls crop the video locally on the cluster. They do not move the phone car marker. Center and zoom apply only in Crop picture mode. Save, then reconnect CarPlay.</string>
+    <string name="settings_leapmotor_cluster_crop_x">Crop center · horizontal</string>
+    <string name="settings_leapmotor_cluster_crop_y">Crop center · vertical</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">Crop zoom</string>
 </resources>

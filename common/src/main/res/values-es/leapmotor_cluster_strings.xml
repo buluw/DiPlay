@@ -2,10 +2,25 @@
 <resources>
     <string name="settings_leapmotor_cluster_target">Pantalla de destino Leapmotor</string>
     <string name="settings_leapmotor_cluster_none">Sin seleccionar</string>
-    <string name="settings_leapmotor_cluster_hint">Estacione antes de probar. Seleccione la pantalla, confirme la imagen y vuelva a conectar CarPlay. Usa un flujo de mapa independiente, sin duplicar la pantalla principal ni cambiar el modo original del cuadro.</string>
+    <string name="settings_leapmotor_cluster_hint">Con el coche aparcado, confirma la pantalla y calibra el área visible del mapa. Elige mapa independiente o duplicación y vuelve a conectar CarPlay. No cambia el modo del cuadro original.</string>
     <string name="settings_leapmotor_cluster_missing">La pantalla seleccionada no está disponible o cambió su identidad. Selecciónela de nuevo; no se usará otra pantalla.</string>
     <string name="settings_leapmotor_cluster_no_displays">No hay pantallas secundarias accesibles. Active la proyección del cuadro original y vuelva a abrir esta página.</string>
     <string name="settings_leapmotor_cluster_test">Prueba de pantalla DiPlay · 5 segundos</string>
     <string name="settings_leapmotor_cluster_confirm">¿La imagen apareció en el área de proyección deseada? Confirme para guardar la pantalla y activar el mapa en la próxima conexión.</string>
     <string name="settings_leapmotor_cluster_unavailable">Esta pantalla no permite Presentation. No se guardó la selección.</string>
+    <string name="settings_leapmotor_cluster_viewport">Área visible del cuadro</string>
+    <string name="settings_leapmotor_cluster_source">Origen de la imagen del cuadro</string>
+    <string name="settings_leapmotor_cluster_independent">Mapa independiente</string>
+    <string name="settings_leapmotor_cluster_mirror">Duplicar pantalla principal</string>
+    <string name="settings_leapmotor_cluster_source_hint">El mapa independiente usa el canal del cuadro del teléfono. El reflejo sigue la imagen principal de CarPlay y los cambios de aplicación sin solicitar otra pantalla. El encuadre local muestra la imagen completa o un recorte. Guarda y vuelve a conectar CarPlay.</string>
+    <string name="settings_leapmotor_cluster_viewport_hint">Una pantalla de 1920×720 usa inicialmente la ventana derecha de 720×720. Con el vehículo estacionado, elige Cuadrado derecho y ajusta los cuatro bordes al mapa visible. Guarda y vuelve a conectar CarPlay.</string>
+    <string name="settings_leapmotor_cluster_right_square">Cuadrado derecho</string>
+    <string name="settings_leapmotor_cluster_full_canvas">Lienzo completo</string>
+    <string name="settings_leapmotor_cluster_framing">Encuadre local del cuadro</string>
+    <string name="settings_leapmotor_cluster_fit">Imagen completa</string>
+    <string name="settings_leapmotor_cluster_crop">Recortar imagen</string>
+    <string name="settings_leapmotor_cluster_framing_hint">Estos controles recortan el vídeo localmente en el cuadro. No mueven el marcador del teléfono. El centro y el zoom solo se aplican al recorte. Guarda y vuelve a conectar CarPlay.</string>
+    <string name="settings_leapmotor_cluster_crop_x">Centro del recorte · horizontal</string>
+    <string name="settings_leapmotor_cluster_crop_y">Centro del recorte · vertical</string>
+    <string name="settings_leapmotor_cluster_crop_zoom">Zoom del recorte</string>
 </resources>

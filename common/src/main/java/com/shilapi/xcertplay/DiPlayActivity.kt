@@ -2183,7 +2183,7 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                 AirPlayPersistence.saveClusterMapEnabled(this, it)
                 render()
             }
-            if (clusterMapEnabled) {
+            if (clusterMapEnabled && LeapmotorClusterRoute.configuration(this)?.mirrorMain != true) {
                 clusterSpeedometerControls(card)
                 clusterMusicControls(card)
                 toggle(card, getString(R.string.center_map_card),
@@ -2321,7 +2321,8 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
                                 AirPlayPersistence.saveClusterMapScalePercent(this, sizes[it])
                             }
                         }
-                        if (!diLink4 || AirPlayPersistence.loadClusterSafeAreaRect(this) == null) {
+                        if (!LeapmotorClusterRoute.configured(this) &&
+                            (!diLink4 || AirPlayPersistence.loadClusterSafeAreaRect(this) == null)) {
                             card.addView(overlaySliderRow(
                                 getString(if (turnCard) R.string.turn_card_horizontal else R.string.car_marker_horizontal),
                                 CarPlayClusterDisplay.markerXPercents,
@@ -5490,11 +5491,152 @@ class DiPlayActivity : ComponentActivity(), AppAppearanceOwner {
             height = ViewGroup.LayoutParams.WRAP_CONTENT
         })
         card.addView(label(getString(R.string.settings_leapmotor_cluster_hint), 14, MUTED))
+        if (selected != null) {
+            val rect = LeapmotorClusterRoute.viewport(this)!!
+            card.addView(button(getString(R.string.settings_leapmotor_cluster_viewport) + " · " +
+                rect.width + " × " + rect.height + " (" + rect.left + ", " + rect.top + ")", false) {
+                openLeapmotorClusterViewportEditor()
+            }, matchButton(SETTINGS_BLOCK_GAP_DP, 60).apply { height = ViewGroup.LayoutParams.WRAP_CONTENT })
+            val mirror = LeapmotorClusterRoute.configuration(this)?.mirrorMain == true
+            val modes = listOf(getString(R.string.settings_leapmotor_cluster_independent),
+                getString(R.string.settings_leapmotor_cluster_mirror))
+            choice(card, getString(R.string.settings_leapmotor_cluster_source), modes, if (mirror) 1 else 0) {
+                LeapmotorClusterRoute.saveMirrorMain(this, it == 1)
+                markReconnectNeeded()
+                render()
+            }
+            card.addView(label(getString(R.string.settings_leapmotor_cluster_source_hint), 14, MUTED))
+            val framing = LeapmotorClusterRoute.configuration(this)?.framing ?: LeapmotorClusterRoute.Framing()
+            card.addView(button(getString(R.string.settings_leapmotor_cluster_framing) + " · " +
+                getString(if (framing.crop) R.string.settings_leapmotor_cluster_crop else R.string.settings_leapmotor_cluster_fit), false) {
+                openLeapmotorClusterFramingEditor()
+            }, matchButton(SETTINGS_BLOCK_GAP_DP, 60).apply { height = ViewGroup.LayoutParams.WRAP_CONTENT })
+        }
         if (selected != null && LeapmotorClusterRoute.findDisplay(this) == null) {
             card.addView(label(getString(R.string.settings_leapmotor_cluster_missing), 14, WARNING))
         } else if (LeapmotorClusterRoute.candidates(this).isEmpty()) {
             card.addView(label(getString(R.string.settings_leapmotor_cluster_no_displays), 14, MUTED))
         }
+    }
+
+    private fun openLeapmotorClusterViewportEditor() {
+        val display = LeapmotorClusterRoute.findDisplay(this) ?: run {
+            toast(getString(R.string.settings_leapmotor_cluster_missing)); return
+        }
+        val key = LeapmotorClusterRoute.identity(display)
+        val initial = LeapmotorClusterRoute.viewport(this) ?: return
+        clusterSafeAreaDialog?.dismiss()
+        val preview = android.app.Presentation(this, display)
+        val live = SafeAreaEditorView(preview.context).apply {
+            interactive = false
+            compactCoordinates = true
+            setBackgroundColor(Color.BLACK)
+            setRect(initial, key.width, key.height)
+        }
+        val editor = SafeAreaEditorView(this).apply {
+            setBackgroundColor(SURFACE)
+            setRect(initial, key.width, key.height)
+            compactCoordinates = true
+        }
+        val dialog = appDialog().apply { requestWindowFeature(Window.FEATURE_NO_TITLE) }
+        val panel = column().apply {
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+            setBackgroundColor(SURFACE)
+        }
+        panel.addView(label(getString(R.string.settings_leapmotor_cluster_viewport), 18, TEXT, true))
+        panel.addView(label(getString(R.string.settings_leapmotor_cluster_viewport_hint), 14, MUTED))
+        val presets = row()
+        fun preset(rect: com.shilapi.xcertplay.airplay.SafeAreaRect) {
+            editor.setRect(rect, key.width, key.height)
+            live.setRect(rect, key.width, key.height)
+        }
+        presets.addView(button(getString(R.string.settings_leapmotor_cluster_right_square), false) {
+            preset(LeapmotorClusterViewport.rightSquare(key.width, key.height))
+        }, LinearLayout.LayoutParams(0, dp(56), 1f))
+        presets.addView(button(getString(R.string.settings_leapmotor_cluster_full_canvas), false) {
+            preset(com.shilapi.xcertplay.airplay.SafeAreaRect(0, 0, key.width, key.height))
+        }, LinearLayout.LayoutParams(0, dp(56), 1f))
+        panel.addView(presets)
+        panel.addView(ClusterSafeAreaPreviewFrame(this, editor, key.width, key.height),
+            LinearLayout.LayoutParams(-1, 0, 1f))
+        val actions = row()
+        actions.addView(button(getString(R.string.cancel), false) { dialog.dismiss() },
+            LinearLayout.LayoutParams(0, dp(56), 1f))
+        actions.addView(button(getString(R.string.save), true) {
+            val rect = editor.currentRectForSource()
+            if (rect != null && LeapmotorClusterRoute.saveViewport(this, key, rect)) {
+                dialog.dismiss()
+                markReconnectNeeded()
+                render()
+            } else toast(getString(R.string.settings_leapmotor_cluster_missing))
+        }, LinearLayout.LayoutParams(0, dp(56), 1f))
+        panel.addView(actions)
+        dialog.setContentView(panel, ViewGroup.LayoutParams(-1, -1))
+        editor.onRectChanged = { live.setRect(it, key.width, key.height) }
+        clusterSafeAreaDialog = dialog
+        dialog.setOnDismissListener {
+            editor.onRectChanged = null
+            preview.setOnDismissListener(null)
+            runCatching { preview.dismiss() }
+            if (clusterSafeAreaDialog === dialog) clusterSafeAreaDialog = null
+        }
+        preview.setOnDismissListener { dialog.dismiss() }
+        try {
+            preview.setContentView(live)
+            preview.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            preview.show()
+            dialog.show()
+            dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9f).toInt(),
+                (resources.displayMetrics.heightPixels * 0.85f).toInt())
+        } catch (_: RuntimeException) {
+            dialog.dismiss()
+            runCatching { preview.dismiss() }
+            toast(getString(R.string.settings_leapmotor_cluster_unavailable))
+        }
+    }
+
+    private fun openLeapmotorClusterFramingEditor() {
+        val selected = LeapmotorClusterRoute.configuration(this) ?: return
+        var pending = selected.framing
+        clusterSafeAreaDialog?.dismiss()
+        val panel = column().apply {
+            val padding = dp(SETTINGS_BLOCK_GAP_DP)
+            setPadding(padding, padding, padding, padding)
+        }
+        panel.addView(label(getString(R.string.settings_leapmotor_cluster_framing_hint), 14, MUTED))
+        choice(panel, getString(R.string.settings_leapmotor_cluster_framing),
+            listOf(getString(R.string.settings_leapmotor_cluster_fit), getString(R.string.settings_leapmotor_cluster_crop)),
+            if (pending.crop) 1 else 0, reconnects = false) { pending = pending.copy(crop = it == 1) }
+        panel.addView(overlaySliderRow(getString(R.string.settings_leapmotor_cluster_crop_x),
+            (0..100).toList(), pending.centerX) { it.toString() + "%" }.also {
+            it.onSave = { value -> pending = pending.copy(centerX = value) }
+        })
+        panel.addView(overlaySliderRow(getString(R.string.settings_leapmotor_cluster_crop_y),
+            (0..100).toList(), pending.centerY) { it.toString() + "%" }.also {
+            it.onSave = { value -> pending = pending.copy(centerY = value) }
+        })
+        panel.addView(overlaySliderRow(getString(R.string.settings_leapmotor_cluster_crop_zoom),
+            (100..300).toList(), pending.zoom) { it.toString() + "%" }.also {
+            it.onSave = { value -> pending = pending.copy(zoom = value) }
+        })
+        val scroll = ScrollView(this).apply { addView(panel) }
+        val dialog = appDialogBuilder().setTitle(getString(R.string.settings_leapmotor_cluster_framing))
+            .setView(scroll).setNegativeButton(getString(R.string.cancel), null)
+            .setPositiveButton(getString(R.string.save), null).create()
+        clusterSafeAreaDialog = dialog
+        dialog.setOnDismissListener { if (clusterSafeAreaDialog === dialog) clusterSafeAreaDialog = null }
+        dialog.setOnShowListener {
+            dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).setOnClickListener {
+                if (LeapmotorClusterRoute.saveFraming(this, selected.identity, pending)) {
+                    dialog.dismiss()
+                    markReconnectNeeded()
+                    render()
+                } else toast(getString(R.string.settings_leapmotor_cluster_missing))
+            }
+        }
+        dialog.show()
     }
 
     private fun previewLeapmotorCluster(display: android.view.Display) {

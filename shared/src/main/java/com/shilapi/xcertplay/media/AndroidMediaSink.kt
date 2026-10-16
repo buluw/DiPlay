@@ -243,6 +243,40 @@ class AndroidMediaSink(
     @Volatile private var screenStreamActiveChanged = onScreenStreamActiveChanged
     private val surfaces = ConcurrentHashMap<Int, Surface>()
     private val videoDecoders = ConcurrentHashMap<Int, VideoDecoder>()
+    private val configuredVideoSizes = ConcurrentHashMap<Int, Pair<Int, Int>>()
+    private val decodedVideoSizes = ConcurrentHashMap<Int, Pair<Int, Int>>()
+    @Volatile private var videoSizeChanged: ((Int, Int, Int) -> Unit)? = null
+
+    /** Set before starting the session; a secondary decoder must use its own negotiated canvas. */
+    fun setVideoSize(type: Int, width: Int, height: Int) {
+        require(width > 0 && height > 0)
+        synchronized(videoOwnershipLock) {
+            check(!videoClosed && videoDecoders[type] == null)
+            configuredVideoSizes[type] = width to height
+        }
+    }
+
+    fun videoSize(type: Int): Pair<Int, Int> = decodedVideoSizes[type]
+        ?: configuredVideoSizes[type] ?: (videoWidth to videoHeight)
+
+    /** Listener runs on the decoder thread. The display owner must dispatch to its UI thread. */
+    fun setVideoSizeChangedListener(listener: ((Int, Int, Int) -> Unit)?) {
+        videoSizeChanged = listener
+    }
+
+    private fun recordVideoSize(type: Int, decoder: VideoDecoder, width: Int, height: Int) {
+        val changed = synchronized(videoOwnershipLock) {
+            if (videoClosed || decoder.isClosed) return
+            // A background session can decode only on a mirror. Accept its actual geometry, but
+            // never let a retired decoder overwrite the current stream after a detach or reconnect.
+            val current = videoDecoders[type] === decoder || synchronized(mirrorLock) {
+                mirrorDecoders.any { (id, mirror) -> id.first == type && mirror === decoder }
+            }
+            if (!current) return
+            decodedVideoSizes.put(type, width to height) != (width to height)
+        }
+        if (changed) runCatching { videoSizeChanged?.invoke(type, width, height) }
+    }
     // Surface capture, worker publication, retirement and detach snapshots share one ownership boundary.
     // Native codec work and waits never run under this lock.
     private val videoOwnershipLock = Any()
@@ -400,6 +434,10 @@ class AndroidMediaSink(
         val listeners = synchronized(videoOwnershipLock) {
             closingVideoDecoders -= decoder
             videoDecoders.entries.removeIf { it.value === decoder }
+            synchronized(mirrorLock) {
+                // An old worker may finish after the same mirror key has a replacement.
+                mirrorDecoders.entries.removeIf { it.value === decoder }
+            }
             if (videoClosed && videoDecoders.isEmpty() && closingVideoDecoders.isEmpty()) {
                 videoReleasedListeners.toList().also { videoReleasedListeners.clear() }
             } else emptyList()
@@ -491,6 +529,7 @@ class AndroidMediaSink(
         synchronized(videoOwnershipLock) {
             if (videoClosed) return
             if (!active) {
+                decodedVideoSizes.remove(type)
                 videoRecoveryHandlers.remove(type)
                 videoDiagnosticHandlers.remove(type)
                 videoDecoders[type]?.let { retire(type, it) }
@@ -631,6 +670,8 @@ class AndroidMediaSink(
         AmbientMusicController.closeSink(ambientSinkToken)
         synchronized(videoOwnershipLock) {
             videoClosed = true
+            videoSizeChanged = null
+            decodedVideoSizes.clear()
             videoDecoders.entries.toList().forEach { (type, decoder) -> retire(type, decoder) }
             synchronized(mirrorLock) {
                 mirrorDecoders.values.forEach(VideoDecoder::close)
@@ -672,26 +713,30 @@ class AndroidMediaSink(
         }
     }
 
-    private fun newVideoDecoder(type: Int, surface: Surface?, statsLabel: String? = null, startImmediately: Boolean = true) = VideoDecoder(
-        type,
-        surface,
-        videoWidth,
-        videoHeight,
-        preferSoftwareHevcDecoder,
-        requestKeyFrame = { requestVideoRecovery(type) },
-        report = { videoDiagnosticHandlers[type]?.invoke(it) },
-        statsLabel = statsLabel,
-        onExit = ::onVideoDecoderExit,
-        // Only the main screen goes to the host's SurfaceView; mirrors and the cluster keep their path.
-        pacingDelayNanos = if (type == MAIN_SCREEN_TYPE && statsLabel == null) videoPacingDelayMillis * 1_000_000L else 0L,
-        operatingRate = videoOperatingRate(type, statsLabel, mainVideoFrameRate),
-        vendorLowLatency = vendorLowLatencyDecoder,
-        dedicatedOutputThread = vendorLowLatencyDecoder,
-        framesAtOnce = type == MAIN_SCREEN_TYPE && statsLabel == null && videoPacingDelayMillis > 0,
-        // Keep the experimental MTK mode on the main CarPlay picture only. Mirrors and the
-        // cluster have separate timing and must retain their established decoder configuration.
-        mtkDecoderTuningEnabled = mtkDecoderTuningEnabled && type == MAIN_SCREEN_TYPE && statsLabel == null,
-    ).also { if (startImmediately) it.start() }
+    private fun newVideoDecoder(type: Int, surface: Surface?, statsLabel: String? = null, startImmediately: Boolean = true): VideoDecoder {
+        val size = configuredVideoSizes[type] ?: (videoWidth to videoHeight)
+        return VideoDecoder(
+            type,
+            surface,
+            size.first,
+            size.second,
+            preferSoftwareHevcDecoder,
+            requestKeyFrame = { requestVideoRecovery(type) },
+            report = { videoDiagnosticHandlers[type]?.invoke(it) },
+            statsLabel = statsLabel,
+            onExit = ::onVideoDecoderExit,
+            onOutputSize = { decoder, width, height -> recordVideoSize(type, decoder, width, height) },
+            // Only the main screen goes to the host's SurfaceView; mirrors and the cluster keep their path.
+            pacingDelayNanos = if (type == MAIN_SCREEN_TYPE && statsLabel == null) videoPacingDelayMillis * 1_000_000L else 0L,
+            operatingRate = videoOperatingRate(type, statsLabel, mainVideoFrameRate),
+            vendorLowLatency = vendorLowLatencyDecoder,
+            dedicatedOutputThread = vendorLowLatencyDecoder,
+            framesAtOnce = type == MAIN_SCREEN_TYPE && statsLabel == null && videoPacingDelayMillis > 0,
+            // Keep the experimental MTK mode on the main CarPlay picture only. Mirrors and the
+            // cluster have separate timing and must retain their established decoder configuration.
+            mtkDecoderTuningEnabled = mtkDecoderTuningEnabled && type == MAIN_SCREEN_TYPE && statsLabel == null,
+        ).also { if (startImmediately) it.start() }
+    }
 
     @Synchronized
     private fun audioRenderer(id: AudioStreamId, format: AudioFormat): AudioRenderer {
@@ -866,7 +911,7 @@ internal const val PICTURE_ORDER_PARAMETER = "vendor.qti-ext-dec-picture-order.e
 
 /** Serial MediaCodec video decoder: one worker owns configure and frame feeding. */
 private class VideoDecoder(
-    streamType: Int,
+    private val streamType: Int,
     surface: Surface?,
     private val width: Int,
     private val height: Int,
@@ -891,6 +936,7 @@ private class VideoDecoder(
      */
     private val framesAtOnce: Boolean = false,
     private val mtkDecoderTuningEnabled: Boolean = false,
+    private val onOutputSize: (VideoDecoder, Int, Int) -> Unit = { _, _, _ -> },
 ) : Closeable {
     private val pacer = FramePacer()
     private val pacingDelay = if (pacingDelayNanos > 0) PacingDelay(pacingDelayNanos) else null
@@ -998,6 +1044,9 @@ private class VideoDecoder(
 
     /** True once the worker has exited, so its codec is released. */
     val exited: Boolean get() = !thread.isAlive
+
+    /** Stops accepting callbacks as soon as close or worker cleanup begins. */
+    val isClosed: Boolean get() = !running
 
     /**
      * After [close], waits until [deadlineNanos] for the worker to release its codec and exit. An
@@ -1608,12 +1657,16 @@ private class VideoDecoder(
     }
 
     private fun logOutputFormat(format: MediaFormat) {
+        videoVisibleSize(format.intOrNull(MediaFormat.KEY_WIDTH) ?: 0,
+            format.intOrNull(MediaFormat.KEY_HEIGHT) ?: 0, format.intOrNull("crop-left"),
+            format.intOrNull("crop-top"), format.intOrNull("crop-right"), format.intOrNull("crop-bottom"))
+            ?.let { (width, height) -> onOutputSize(this, width, height) }
         report("output format requested=${width}x${height} " +
             "coded=${format.intOrNull(MediaFormat.KEY_WIDTH)}x${format.intOrNull(MediaFormat.KEY_HEIGHT)} " +
             "crop=${format.intOrNull("crop-left")},${format.intOrNull("crop-top")}," +
             "${format.intOrNull("crop-right")},${format.intOrNull("crop-bottom")} " +
             "stride=${format.intOrNull(MediaFormat.KEY_STRIDE)} slice=${format.intOrNull(MediaFormat.KEY_SLICE_HEIGHT)} " +
-            "color=${format.intOrNull(MediaFormat.KEY_COLOR_STANDARD)}/${format.intOrNull(MediaFormat.KEY_COLOR_RANGE)}/${format.intOrNull(MediaFormat.KEY_COLOR_TRANSFER)}")
+            "color=${format.intOrNull(MediaFormat.KEY_COLOR_STANDARD)}/${format.intOrNull(MediaFormat.KEY_COLOR_RANGE)}/${format.intOrNull(MediaFormat.KEY_COLOR_TRANSFER)} stream=$streamType")
         Log.i(
             TAG,
             "video decoder output format " +
